@@ -20,7 +20,7 @@
 - Groups (user): alewife (106), smelt (109), bloater (204), plus other in Huron only; N summed over life
   stages. Michigan has no other group (user): the L_2_Y catch files hold only a few species (the release has
   ~3% other for these tows), so Michigan proportions are of the three species. `R/tow_catch.R` `tow_catch()`.
-  Totals (1,183 tows): MI 78,396 fish, 40 zero-catch tows; HU 110,421 (other 5,394), 11 zero-catch.
+  Totals (1,183 tows): MI 78,396 fish, 41 tows with none of the three; HU 110,421 (other 5,394), 11 zero-catch.
   Smooth covariate terms, no bins (user).
 
 ## Tasks
