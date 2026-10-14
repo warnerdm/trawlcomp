@@ -36,7 +36,9 @@
   percentile 0.43 / 0.42; r = 0.77. Smelt-dominated by number but bloater/cisco by weight in 43 tows.
   J >= 0.5 by both, n >= 10: 14 tows; J >= 0.4 by both: 41; J >= 0.3: 70. Other species 3% of fish.
   J_w NA for 3 tows (58517, 85739 bloater weight missing; 58561 one unweighed smelt).
-- Next: the user picks the "mixed" definition (index, number vs weight, cutoff, minimum catch).
+- Mixed definition (user, 2026-10-14): J by number >= 0.4 to start (J_w tracks it). With n >= 10: 71 tows
+  (vessel 88: 64, 35: 7; 2004-2018, 1-12 per year); 17 of them have J_w <= 0.3 (mostly bloater or cisco by
+  weight). Minimum catch not yet chosen.
 
 ## Tasks
 2. Grouping: covariates rather than crossed cells (proposed, not yet confirmed): lake, fishing depth
