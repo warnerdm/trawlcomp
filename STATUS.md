@@ -17,6 +17,15 @@
   lake-year-transect (mostly 1-2), usually at different fishing depths. Tows with >= 1 other tow on the same
   lake-year-transect: any depth MI 495/701, HU 372/493; within 10 m MI 234, HU 123; within 5 m MI 135, HU 63.
 
+- Groups (user): alewife (106), smelt (109), bloater (204), other; N summed over life stages. `R/tow_catch.R`
+  `tow_catch()`. Totals (1,183 tows): MI 78,475 fish (other 79), 40 zero-catch tows; HU 110,421 (other 5,394),
+  11 zero-catch. Smooth covariate terms, no bins (user).
+
+## Open questions
+- Michigan L_2_Y catch files hold only species 106, 109, 204, 203, 202, 129 (4 rows), 130 (1 row). For the
+  494 of these tows also in the USGS release, the release has ~3% other species (129 1.3%, 130 0.6%, 801,
+  902, 904, ...). Michigan "other" from the files is therefore incomplete.
+
 ## Tasks
 2. Grouping: covariates rather than crossed cells (proposed, not yet confirmed): lake, fishing depth
    (probably two groups), bottom depth, lat, lon (bins or smooths), with a tow random effect.

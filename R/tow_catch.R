@@ -1,0 +1,30 @@
+# Catch per tow by species group. N is summed over life stages (user, 2026-10-14).
+# Michigan catch from the L_2_Y_<year>_Acoustic_tr_catch.csv files only; Huron from the USGS release TR_CATCH.csv.
+source("D:/pyprojects/trawlcomp/R/select_tows.R")
+
+SPECIES_GROUPS <- c(`106` = "alewife", `109` = "smelt", `204` = "bloater")
+
+read_catch <- function() {
+  mi <- list.files(TRAWL_DIR, pattern = "^L_2_Y_[0-9]{4}_Acoustic_tr_catch[.]csv$", full.names = TRUE) %>%
+    map(\(f) read_csv(f, show_col_types = FALSE, col_types = cols(.default = "c"))) %>%
+    list_rbind() %>%
+    mutate(lake = "Michigan")
+  hu <- read_trawl("TR_CATCH.csv", col_types = cols(.default = "c")) %>%
+    mutate(lake = "Huron")
+  bind_rows(mi, hu) %>%
+    transmute(OP_ID = as.integer(OP_ID), lake, SPECIES = as.integer(SPECIES), N = as.numeric(N))
+}
+
+# One row per tow in `tows`, with counts alewife, smelt, bloater, other and n (total). Tows with no catch
+# rows get zeros. The catch is matched on OP_ID and lake, so each lake uses its own source.
+tow_catch <- function(tows) {
+  counts <- read_catch() %>%
+    semi_join(tows, by = c("OP_ID", "lake")) %>%
+    mutate(group = coalesce(SPECIES_GROUPS[as.character(SPECIES)], "other")) %>%
+    summarise(.by = c(OP_ID, group), N = sum(N)) %>%
+    pivot_wider(names_from = group, values_from = N, values_fill = 0)
+  tows %>%
+    left_join(counts, by = "OP_ID") %>%
+    mutate(across(c(alewife, smelt, bloater, other), \(x) coalesce(x, 0)),
+           n = alewife + smelt + bloater + other)
+}
