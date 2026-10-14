@@ -4,6 +4,10 @@ source("D:/pyprojects/trawlcomp/R/select_tows.R")
 
 SPECIES_GROUPS <- c(`106` = "alewife", `109` = "smelt", `204` = "bloater")
 
+# Alewife caught in tows fishing deeper than this are contamination (caught while the net passes through the
+# upper water column; bottom tows at the same spots at night catch none) and are set to 0 (user, 2026-10-14).
+ALEWIFE_CONTAMINATION_DEPTH_M <- 40
+
 read_catch <- function() {
   mi <- list.files(TRAWL_DIR, pattern = "^L_2_Y_[0-9]{4}_Acoustic_tr_catch[.]csv$", full.names = TRUE) %>%
     map(\(f) read_csv(f, show_col_types = FALSE, col_types = cols(.default = "c"))) %>%
@@ -18,7 +22,7 @@ read_catch <- function() {
 # One row per tow in `tows`, with counts alewife, smelt, bloater, other and n (total). Tows with no catch
 # rows get zeros. The catch is matched on OP_ID and lake, so each lake uses its own source.
 # Michigan has no "other" group (user, 2026-10-14): the L_2_Y files hold only a few species, so other = NA
-# and n = alewife + smelt + bloater there.
+# and n = alewife + smelt + bloater there. alewife_removed: alewife set to 0 as contamination.
 tow_catch <- function(tows) {
   counts <- read_catch() %>%
     semi_join(tows, by = c("OP_ID", "lake")) %>%
@@ -28,6 +32,10 @@ tow_catch <- function(tows) {
   tows %>%
     left_join(counts, by = "OP_ID") %>%
     mutate(across(c(alewife, smelt, bloater, other), \(x) coalesce(x, 0)),
+           contaminated = coalesce(fishing_depth > ALEWIFE_CONTAMINATION_DEPTH_M, FALSE),
+           alewife_removed = if_else(contaminated, alewife, 0),
+           alewife = if_else(contaminated, 0, alewife),
            other = if_else(lake == "Michigan", NA_real_, other),
-           n = alewife + smelt + bloater + coalesce(other, 0))
+           n = alewife + smelt + bloater + coalesce(other, 0)) %>%
+    select(-contaminated)
 }

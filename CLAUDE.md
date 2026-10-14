@@ -14,6 +14,8 @@ time, what would be the mean proportion of a group and its SD? Selectivity is ou
 - Lake sources (user, 2026-10-14): Michigan tows, catch and lengths come ONLY from the `L_2_Y_<year>_Acoustic_*`
   files (never OP.csv and the associated release files). Huron comes from the release, TARGET 209/210 in OP_TARGET.csv.
 - Groups: alewife, smelt, bloater (N summed over life stages); Huron also has other. Michigan has no other group.
+- Alewife in tows with fishing depth > 40 m are contamination (net passing through the upper water column) and
+  are set to 0, both lakes (user, 2026-10-14; tow_catch.ALEWIFE_CONTAMINATION_DEPTH_M).
 - Paths are set once in `R/paths.R`. Never hard-code them elsewhere.
 
 ## Environment
