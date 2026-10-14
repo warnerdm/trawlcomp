@@ -8,6 +8,16 @@ SPECIES_GROUPS <- c(`106` = "alewife", `109` = "smelt", `204` = "bloater")
 # upper water column; bottom tows at the same spots at night catch none) and are set to 0 (user, 2026-10-14).
 ALEWIFE_CONTAMINATION_DEPTH_M <- 40
 
+# Depth layers: fishing depth < 35 m (shallow) and >= 35 m (deep) (user, 2026-10-14)
+LAYER_BREAK_M <- 35
+
+add_layer <- function(d) {
+  mutate(d, layer = factor(if_else(fishing_depth < LAYER_BREAK_M, paste0("< ", LAYER_BREAK_M, " m"),
+                                   paste0(">= ", LAYER_BREAK_M, " m")),
+                           paste0(c("< ", ">= "), LAYER_BREAK_M, " m")))
+}
+
+
 read_catch <- function() {
   mi <- list.files(TRAWL_DIR, pattern = "^L_2_Y_[0-9]{4}_Acoustic_tr_catch[.]csv$", full.names = TRUE) %>%
     map(\(f) read_csv(f, show_col_types = FALSE, col_types = cols(.default = "c"))) %>%

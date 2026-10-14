@@ -2,14 +2,7 @@
 # Layers: fishing depth < 35 m (shallow) and >= 35 m (deep) (user, 2026-10-14). Only tows with fish in the
 # groups (n > 0) carry composition information, so effort counts those.
 source("D:/pyprojects/trawlcomp/R/se_plots.R")
-
-LAYER_BREAK_M <- 35
-
-add_layer <- function(d) {
-  mutate(d, layer = factor(if_else(fishing_depth < LAYER_BREAK_M, paste0("< ", LAYER_BREAK_M, " m"),
-                                   paste0(">= ", LAYER_BREAK_M, " m")),
-                           paste0(c("< ", ">= "), LAYER_BREAK_M, " m")))
-}
+source("D:/pyprojects/trawlcomp/R/tow_catch.R")   # LAYER_BREAK_M, add_layer
 
 # Tows per lake-year-layer (all tows and tows with catch)
 effort_by_year <- function(catch) {

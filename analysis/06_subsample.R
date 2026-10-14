@@ -13,11 +13,13 @@ props <- year_layer_props(catch)
 cmp <- empirical_vs_model(props, tow_stats)
 write_csv(cmp, file.path(OUTPUT_DIR, "subsample_empirical_vs_model.csv"))
 options(width = 200)
-cat("Empirical / model single-tow SD, median (range) over lake-years with >= 5 tows in the layer:\n")
+# RMS over years (the SE of a mean depends on the average variance; medians of SDs hide the years where
+# deep tows are mixed and overweight the years where they are all one species)
+cat("Empirical vs model single-tow SD, RMS over lake-years with >= 5 tows in the layer:
+")
 print(as.data.frame(cmp %>% summarise(.by = c(lake, layer, group), years = n(),
-  sd_emp = round(median(sd_emp), 3), sd_model = round(median(sd_model), 3),
-  ratio_min = round(min(ratio), 2), ratio_max = round(max(ratio), 2), ratio = round(median(ratio), 2)) %>%
-  arrange(lake, layer, group)))
+  rms_emp = round(sqrt(mean(sd_emp^2)), 3), rms_model = round(sqrt(mean(sd_model^2)), 3)) %>%
+  mutate(ratio = round(rms_emp / rms_model, 2)) %>% arrange(lake, layer, group)))
 
 # 2. Subsampling curves for the deep layers with the most tows, against the model curve for that layer
 picks <- tribble(~lake, ~YEAR, "Huron", 2013, "Huron", 2016, "Huron", 2017, "Michigan", 2005, "Michigan", 2022)
