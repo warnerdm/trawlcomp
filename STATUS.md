@@ -1,17 +1,12 @@
 # trawlcomp status
 
 ## Current state (2026-10-14)
-- Tow selection: `R/select_tows.R` `select_tows()`. Acoustic-survey tows = OP_TARGET TARGET 209/210 (user).
-  - Michigan: bloaterTS per-year files, 2004-2024. 510 tows (2004-2018) pass the TARGET check; 16 file tows
-    (8 in 2017, 8 in 2018) are not tagged 209/210 and are dropped. 175 tows from 2019-2024 have no TARGET
-    (release ends 2018): kept, flagged target_checked = FALSE.
-  - Huron: USGS release, 2004+, SAMPLE_TYPE 1, vessels 17/35/88: 493 tows (2004-2018, none in 2006).
-  - Not used: 50 release Michigan tows tagged 209/210 that are not in the files (mostly vessel 17 with
-    TR_DESIGN 30/33; 11 from vessel 41 in 2018).
-- No trawl-design filter: TARGET defines the tows.
-
-## Open questions
-- Michigan 2019-2024 tows: keep (unchecked) or drop?
+- Tow selection: `R/select_tows.R` `select_tows()` (user, 2026-10-14).
+  - Michigan: every tow in the bloaterTS files `L_2_Y_<year>_Acoustic_optrop.csv`, and only those; the USGS
+    release (OP.csv and associated files) is never used for Michigan. 701 tows, 2004-2024 (no 2020).
+  - Huron: USGS release, OP_TARGET TARGET 209/210, 2004+, SAMPLE_TYPE 1, vessels 17/35/88: 493 tows
+    (2004-2018, none in 2006).
+  - No trawl-design filter.
 
 ## Tasks
 1. Show where the tows sit relative to each other (lake, year, depth, area, time of night) and how many
