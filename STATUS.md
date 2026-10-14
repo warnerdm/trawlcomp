@@ -7,6 +7,9 @@
   - Huron: USGS release, OP_TARGET TARGET 209/210, 2004+, SAMPLE_TYPE 1, vessels 17/35/88: 493 tows
     (2004-2018, none in 2006).
   - No trawl-design filter.
+  - Bad coordinates dropped for now (user): `drop_bad_coordinates()` (missing, or outside the lake box).
+    11 Huron tows: 57431 (2004, 42.05/-83.24, transect nc1), 76630, 78281, 83500 (missing), 89398-89404
+    (Baird 2014, ~0.75/+1.39, not decimal degrees). Leaves Michigan 701, Huron 482.
   - All tows are night tows of the lakewide acoustic surveys (user). Logged TIME 06:00-20:00 in 24 tows:
     17 Huron 2004-2005/2012 at 18:35-20:00 (dusk); Michigan 57437 (10:57), 83437 (07:24), 93081 (06:09),
     83434 (06:02), 81848-81850 (19:00-19:54). Not acted on.
@@ -15,7 +18,8 @@
   lake-year-transect: any depth MI 495/701, HU 372/493; within 10 m MI 234, HU 123; within 5 m MI 135, HU 63.
 
 ## Tasks
-2. Choose the replicate grouping (user decision).
+2. Grouping: covariates rather than crossed cells (proposed, not yet confirmed): lake, fishing depth
+   (probably two groups), bottom depth, lat, lon (bins or smooths), with a tow random effect.
 3. Define the groups (species, species-size) and the within-tow n (whole catch vs length subsample).
 4. Fit the beta-binomial / binomial GLMM; bootstrap check; report each tow's mean and SD with the
    binomial lower bound.

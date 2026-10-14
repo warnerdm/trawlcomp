@@ -44,3 +44,21 @@ select_tows <- function() {
   stopifnot(!any(duplicated(tows$OP_ID)))
   tows
 }
+
+# Lake bounding boxes (decimal degrees) for the coordinate check
+LAKE_BOX <- tribble(
+  ~lake,      ~lat_min, ~lat_max, ~lon_min, ~lon_max,
+  "Michigan",     41.5,     46.2,    -88.1,    -84.7,
+  "Huron",        43.0,     46.4,    -84.8,    -79.6
+)
+
+# Tows with missing start coordinates or coordinates outside their lake's box. Dropped for now (user,
+# 2026-10-14); the bloaterTS tow lists hold the fixes for some of them.
+bad_coordinates <- function(tows) {
+  tows %>%
+    left_join(LAKE_BOX, by = "lake") %>%
+    filter(is.na(lat) | is.na(lon) | lat < lat_min | lat > lat_max | lon < lon_min | lon > lon_max) %>%
+    select(all_of(names(tows)))
+}
+
+drop_bad_coordinates <- function(tows) anti_join(tows, bad_coordinates(tows), by = "OP_ID")
