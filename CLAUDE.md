@@ -11,6 +11,8 @@ time, what would be the mean proportion of a group and its SD? Selectivity is ou
   `TR_OP.csv`/`OP.csv` (operations), `TR_CATCH.csv` (catch), `TR_LF.csv` (length frequency),
   per-year `L_2_Y_<year>_Acoustic_{optrop,tr_catch,tr_lf}.csv`; provenance in `sources.csv` there.
 - Tow lists: `D:\pyprojects\bloaterTS\data\raw\LM_tow_list_2005_2024.csv`, `LH_tow_list_2004_2018.csv`.
+- Lake sources (user, 2026-10-14): Michigan tows, catch and lengths come ONLY from the `L_2_Y_<year>_Acoustic_*`
+  files (never OP.csv and the associated release files). Huron comes from the release, TARGET 209/210 in OP_TARGET.csv.
 - Paths are set once in `R/paths.R`. Never hard-code them elsewhere.
 
 ## Environment
