@@ -38,3 +38,13 @@ q <- ggplot(k, aes(J_n, J_w, colour = dom_w)) + geom_abline(linetype = 2) + geom
   coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
   labs(x = "J by number", y = "J by weight", colour = "dominant by weight") + theme_bw()
 ggsave(file.path(OUTPUT_DIR, "huron_evenness_n_vs_w.png"), q, width = 6.5, height = 5, dpi = 150)
+
+# Candidate mixed tows, and which are already in the bloaterTS Huron tow list (matched to acoustic data there)
+m <- mixed_tows(e) %>%
+  mutate(in_bloaterts_list = OP_ID %in% read_csv(TOW_LIST_LH, show_col_types = FALSE)$OP_ID)
+write_csv(m, file.path(OUTPUT_DIR, "huron_mixed_tows.csv"))
+cat("\nmixed tows (J_n >=", MIXED_J_MIN, ", n >=", MIXED_MIN_N, "):", nrow(m),
+    " in bloaterTS Huron tow list:", sum(m$in_bloaterts_list), "\n")
+print(table(m$YEAR, m$VESSEL))
+cat("dominant by number (rows) and by weight (cols):\n"); print(table(m$dom_n, m$dom_w))
+cat("J_w <= 0.3:", sum(m$J_w <= 0.3, na.rm = TRUE), "\n")

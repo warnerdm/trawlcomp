@@ -55,3 +55,9 @@ tow_evenness <- function(tows, species = EVENNESS_SPECIES_HURON) {
     left_join(other, by = "OP_ID") %>%
     mutate(n_other = coalesce(n_other, 0))
 }
+
+# "Mixed" tow (user, 2026-10-14): Pielou's J by number >= MIXED_J_MIN and at least MIXED_MIN_N fish of the set.
+MIXED_J_MIN <- 0.4
+MIXED_MIN_N <- 30
+
+mixed_tows <- function(ev) filter(ev, n_tot >= MIXED_MIN_N, J_n >= MIXED_J_MIN)
