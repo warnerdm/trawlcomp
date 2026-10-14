@@ -23,6 +23,21 @@
   Totals (1,183 tows): MI 78,396 fish, 41 tows with none of the three; HU 110,421 (other 5,394), 11 zero-catch.
   Smooth covariate terms, no bins (user).
 
+## Mixed-species tows (Huron first; user, 2026-10-14)
+- Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
+  acoustic data (tow regions as in bloaterTS; processing in pydt4, likely a separate project for the tow list,
+  matching and review). Huron acoustic data is on disk for every year 2004-2018.
+- Species set (user): 106 alewife, 109 smelt, 202 cisco, 204 bloater, 504 emerald shiner.
+- First pass done: `R/evenness.R` `tow_evenness()`, `analysis/07_huron_evenness.R` -> output/huron_evenness.csv,
+  huron_evenness_hist.png, huron_evenness_n_vs_w.png. Pielou's J with S fixed at 5, by number and by weight
+  (WEIGHT summed over life stages), alewife contamination rule applied. Reference points: two species 50:50
+  J = 0.43; 80:20 J = 0.31; three equal J = 0.68.
+- Results (482 Huron tows, 470 with catch of the five): median J 0.10 (number) / 0.09 (weight); 90th
+  percentile 0.43 / 0.42; r = 0.77. Smelt-dominated by number but bloater/cisco by weight in 43 tows.
+  J >= 0.5 by both, n >= 10: 14 tows; J >= 0.4 by both: 41; J >= 0.3: 70. Other species 3% of fish.
+  J_w NA for 3 tows (58517, 85739 bloater weight missing; 58561 one unweighed smelt).
+- Next: the user picks the "mixed" definition (index, number vs weight, cutoff, minimum catch).
+
 ## Tasks
 2. Grouping: covariates rather than crossed cells (proposed, not yet confirmed): lake, fishing depth
    (probably two groups), bottom depth, lat, lon (bins or smooths), with a tow random effect.

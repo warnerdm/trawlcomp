@@ -26,7 +26,8 @@ read_catch <- function() {
   hu <- read_trawl("TR_CATCH.csv", col_types = cols(.default = "c")) %>%
     mutate(lake = "Huron")
   bind_rows(mi, hu) %>%
-    transmute(OP_ID = as.integer(OP_ID), lake, SPECIES = as.integer(SPECIES), N = as.numeric(N))
+    transmute(OP_ID = as.integer(OP_ID), lake, SPECIES = as.integer(SPECIES), N = as.numeric(N),
+              WEIGHT = as.numeric(WEIGHT))
 }
 
 # One row per tow in `tows`, with counts alewife, smelt, bloater, other and n (total). Tows with no catch
