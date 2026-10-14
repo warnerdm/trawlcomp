@@ -17,6 +17,8 @@ read_catch <- function() {
 
 # One row per tow in `tows`, with counts alewife, smelt, bloater, other and n (total). Tows with no catch
 # rows get zeros. The catch is matched on OP_ID and lake, so each lake uses its own source.
+# Michigan has no "other" group (user, 2026-10-14): the L_2_Y files hold only a few species, so other = NA
+# and n = alewife + smelt + bloater there.
 tow_catch <- function(tows) {
   counts <- read_catch() %>%
     semi_join(tows, by = c("OP_ID", "lake")) %>%
@@ -26,5 +28,6 @@ tow_catch <- function(tows) {
   tows %>%
     left_join(counts, by = "OP_ID") %>%
     mutate(across(c(alewife, smelt, bloater, other), \(x) coalesce(x, 0)),
-           n = alewife + smelt + bloater + other)
+           other = if_else(lake == "Michigan", NA_real_, other),
+           n = alewife + smelt + bloater + coalesce(other, 0))
 }
