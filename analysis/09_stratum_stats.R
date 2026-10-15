@@ -37,10 +37,13 @@ now <- ss %>% mutate(group = factor(group, lv))
 for (meas in c("N", "WEIGHT")) {
   p <- ggplot(filter(curves, measure == meas), aes(m, se, colour = group)) +
     geom_line(linewidth = 0.8) +
-    geom_point(data = filter(now, measure == meas), aes(tows_per_year, se_now_all, colour = group),
-               inherit.aes = FALSE, size = 2.5) +
+    # distinct shapes: where only two species occur (deep) their SDs are identical and the points coincide
+    geom_point(data = filter(now, measure == meas), aes(tows_per_year, se_now_all, colour = group, shape = group,
+                                                        size = group), inherit.aes = FALSE, stroke = 1.1) +
+    scale_shape_manual(values = c(alewife = 16, smelt = 17, bloater = 1), name = NULL) +
+    scale_size_manual(values = c(alewife = 2.5, smelt = 2.5, bloater = 4), name = NULL) +
     facet_wrap(~stratum_name, nrow = 1) +
-    scale_colour_manual(values = c(alewife = "#1b9e77", smelt = "#d95f02", bloater = "#7570b3"), name = NULL) +
+    scale_colour_manual(values = c(alewife = "magenta", smelt = "gray", bloater = "black"), name = NULL) +
     labs(x = "Tows in the stratum (per year)", y = "SE of the mean proportion",
          title = paste0("Lake Michigan strata: SE of species proportions by ", if (meas == "N") "number" else "weight"),
          subtitle = "SD of tow proportions over all tows (years pooled); points = current median tows per year") +
