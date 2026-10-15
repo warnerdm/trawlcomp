@@ -114,7 +114,11 @@
   zeroing matches its estimates. Consequence: the deep stratum has fish_ha 0 in every row in 2004 and 2010 (no
   sigma at depth); 2015 68/157 rows with sigma, 2022 163/215. 2004 mean fish/ha: surface nearshore 397 (CV 2.4),
   midwater 32, mid-lake 784, offshore 1,150, deep 0. Zero density is normal in Lake Michigan (user); NA/Inf = 0
-  stands as EchoNet2Fish does. Paused here (user, 2026-10-15).
+  stands as EchoNet2Fish does.
+  All years (`analysis/12_acoustic_fish_ha_years.R`; output/acoustic_fish_ha_strata_{by_year,pooled}.csv,
+  acoustic_fish_ha_strata_by_year.png): 20 years. Pooled mean fish/ha (share of zero rows): surface nearshore 377
+  (44%), midwater nearshore 68 (62%), surface mid-lake 355 (60%), surface offshore 433 (63%), deep 18.5 (68%),
+  outside strata 13 (87%). Deep is 0-1 fish/ha in 2004-2011, 6-115 from 2012.
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
