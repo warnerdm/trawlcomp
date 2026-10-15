@@ -53,7 +53,16 @@
   depth 40 m: shallow (554 tows) alewife 0.66 (SD 0.41), smelt 0.20 (0.34), bloater 0.14 (0.30); deep (40-80 m
   over 40-140 m bottom, 91 tows) bloater 0.87 (0.31). k = 3-4 split the deep block (mixed smelt/bloater at
   40-60 m vs bloater core at 60-80 m, 0.95); k = 5-7 split the offshore surface (bottom > 180 m). W_d = share of
-  cells (no acoustic biomass); Neyman ~78-80% of tows shallow. Possible next: minimum 5 tows per cell.
+  cells (no acoustic biomass); Neyman ~78-80% of tows shallow.
+  Restrictions (user, 2026-10-15; analysis/08_strata.R MIN_FISH, MIN_TOWS; outputs tagged _min10fish[_min5tows]):
+  Adams used all tows with complete catch data and cells with >= 2 tows (no catch minimum found; user to reread).
+  >= 10 fish per tow (by number) keeps 469 of 651 tows (deep 91 -> 45; the mixed deep 40-60 m cells were tiny
+  catches, all-smelt or all-bloater). Adding >= 5 tows per cell: 445 tows in 19 cells. k = 4 resembles Adams'
+  four strata: (1) surface 0-20 m over 0-160 m bottom (+ 20-40 m over 80-120 m) alewife 0.72 (SD 0.37), smelt
+  0.16, bloater 0.12; (2) 20-40 m over 20-80 m bottom, mixed 0.45 / 0.34 / 0.22 (SDs 0.35-0.41); (3) deep 40-80 m
+  over 60-120 m, bloater 0.99 (0.04); (4) surface over 160-200 m bottom, alewife 0.89. k = 5 splits the surface
+  over 100-160 m bottom. Adams Table 4 (1994-95): 0.71/0.18/0.06; 0.40/0.20/0.38; offshore alewife 0.93; deep
+  bloater 0.90.
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
