@@ -23,6 +23,38 @@
   Totals (1,183 tows): MI 78,396 fish, 41 tows with none of the three; HU 110,421 (other 5,394), 11 zero-catch.
   Smooth covariate terms, no bins (user).
 
+## Composition variability (Michigan and Huron, 2026-10-14/15)
+- Bottom depths: 2008 Michigan vessel 17 in feet (x 0.3048); 77542, 104167 NA (implausible), as bloaterTS
+  (select_tows). Alewife in tows with fishing depth > 40 m are contamination and set to 0 (user; tow_catch
+  ALEWIFE_CONTAMINATION_DEPTH_M): 992 fish in 42 Michigan tows (+1 Huron); 7 Michigan tows held only alewife and
+  drop out (58086, 58104, 79137, 83153, 85929, 87181, 89419). 58104 (2005 v88, 60.4 m, 279 alewife only) is odd:
+  check its fishing depth. tow_catch(measure = "N" | "WEIGHT"); weight missing for 38 Michigan tows.
+- Composition plots (`R/composition_plots.R`, `analysis/02_composition_plots.R`): fishing depth is the main
+  gradient (MI alewife -> bloater ~25-45 m; HU smelt -> bloater ~30-40 m); spatial patterns too.
+- Models (`R/fit_models.R`, `analysis/03_fit_models.R`; output/model_summary.csv, repeat_tow_stats.csv): one
+  binomial bam per lake and group: s(fishing_depth) + s(bottom_depth) + s(lon, lat) + year RE + tow RE with a
+  separate SD per layer (< 35 m / >= 35 m; user). 651 Michigan, 469 Huron tows. Tow SD (logit) shallow / deep:
+  MI alewife 3.20 / 2.24, smelt 2.89 / 2.11, bloater 2.89 / 2.64; HU smelt 2.12 / 1.74, bloater 2.22 / 1.72,
+  other 2.06 / 1.86. Repeat-tow SD of a proportion ~0.2-0.35, 3-6x the binomial SD; 90% intervals cover
+  0.90-0.99 (in-sample). Effective n per tow ~ n / k^2; ceiling ~1/rho (~2-3 fish).
+- SE vs number of tows (`R/se_plots.R`, `analysis/04_se_vs_tows.R`): SE_i(m) = sd_obs_i / sqrt(m). Fish per tow
+  left out (user: tows are what matter).
+- Effort (`R/effort.R`, `analysis/05_effort.R`): tows with catch per year, median (range): MI < 35 m 26.5
+  (17-47), >= 35 m 5 (1-10); HU 21 (12-44), 9.5 (3-14). SE at current effort, deep: MI bloater 0.087, smelt
+  0.067; HU bloater 0.074, smelt 0.066. Deep layer is on the steep part of the curve. Context: user's question
+  is general (saildrones collect acoustics, the ship only trawls: is more trawling worth it?), not apportioning.
+- Subsampling check (`R/subsample.R`, `analysis/06_subsample.R`): real / model single-tow SD as RMS over years
+  1.05-1.47 for all main groups and layers (model modestly optimistic; real layer SEs ~5-45% larger). Deep MI
+  years are either all bloater (SD 0) or mixed (SD 0.4-0.55); a median over years misleads (earlier error).
+- Adams et al. (2006, NAJFM 26:612-621) depth stratification, Michigan (`R/strata.R`, `analysis/08_strata.R`;
+  output/strata_michigan_{n,weight}.png, strata_tree_michigan_*.png, strata_michigan_summary.csv): 20 m cells of
+  bottom x fishing depth, >= 2 tows, mean + SD of proportions, neighbour-restricted complete linkage
+  (adespatial::constr.hclust; main connected block). Number and weight nearly identical. k = 2: split at fishing
+  depth 40 m: shallow (554 tows) alewife 0.66 (SD 0.41), smelt 0.20 (0.34), bloater 0.14 (0.30); deep (40-80 m
+  over 40-140 m bottom, 91 tows) bloater 0.87 (0.31). k = 3-4 split the deep block (mixed smelt/bloater at
+  40-60 m vs bloater core at 60-80 m, 0.95); k = 5-7 split the offshore surface (bottom > 180 m). W_d = share of
+  cells (no acoustic biomass); Neyman ~78-80% of tows shallow. Possible next: minimum 5 tows per cell.
+
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
   acoustic data (tow regions as in bloaterTS; processing in pydt4, likely a separate project for the tow list,
@@ -41,9 +73,6 @@
   2006), 1-7 per year, vessel 88 38, vessel 35 3. 9 have J_w <= 0.3 (bloater or cisco by weight). Only 1 is in
   the bloaterTS Huron tow list, so 40 need tow matching from scratch.
 
-## Tasks
-2. Grouping: covariates rather than crossed cells (proposed, not yet confirmed): lake, fishing depth
-   (probably two groups), bottom depth, lat, lon (bins or smooths), with a tow random effect.
-3. Define the groups (species, species-size) and the within-tow n (whole catch vs length subsample).
-4. Fit the beta-binomial / binomial GLMM; bootstrap check; report each tow's mean and SD with the
-   binomial lower bound.
+## Tasks (composition variability)
+- Done: tasks 1-4 (grouping by smooth covariates; groups alewife/smelt/bloater(/other); models; SE curves).
+- Open: 58104 fishing depth; Adams strata with a stricter cell minimum; layer-specific results for Huron strata.
