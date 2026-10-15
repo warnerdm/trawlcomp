@@ -119,6 +119,12 @@
   acoustic_fish_ha_strata_by_year.png): 20 years. Pooled mean fish/ha (share of zero rows): surface nearshore 377
   (44%), midwater nearshore 68 (62%), surface mid-lake 355 (60%), surface offshore 433 (63%), deep 18.5 (68%),
   outside strata 13 (87%). Deep is 0-1 fish/ha in 2004-2011, 6-115 from 2012.
+- Huron Adams strata (user, 2026-10-15; 08_strata.R LAKE env var; Huron groups alewife, smelt, bloater, other;
+  >= 5 fish, >= 5 tows; outputs strata_huron_*_min5fish_min5tows): 440 tows, 415 in 17 cells. k = 2: split at
+  fishing depth 40 m: shallow (332 tows) smelt 0.67, bloater 0.21, other 0.11; deep (40-80 m over 40-120 m bottom,
+  83 tows) bloater 0.74 (SD 0.31), smelt 0.20. k = 3 peels off one 7-tow cell (surface over 120-140 m); k = 4 20-40 m
+  over 80-120 m (smelt 0.80); k = 5 splits shallow by bottom depth: 0-40 m bottom (smelt 0.79) vs 40-120 m (smelt
+  0.60, bloater 0.26); k = 6 splits deep at 60 m (40-60 m bloater 0.66; 60-80 m 0.84). Choice of k pending (user).
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
