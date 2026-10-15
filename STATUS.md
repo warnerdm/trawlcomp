@@ -80,6 +80,12 @@
   current effort, surface nearshore alewife 0.13 (vs 0.09 for the mean of proportions), smelt 0.13 (0.07),
   bloater 0.04 (0.06); midwater nearshore 0.18-0.22 (0.19-0.28); offshore and deep smaller than the mean's.
   Approximation: ratio variance is biased with 1-2 tows per year and heavy-tailed catches.
+  Year effects (one-way ANOVA within stratum, by number): significant in surface nearshore (year 10-20% of
+  variance; bloater +0.09 / decade, smelt -0.08) and midwater nearshore bloater (44%; +0.26 / decade, smelt
+  -0.28); none in deep. Pooling years is fine for SDs (5-10% larger), not for nearshore means.
+- Adams Figure 4 style plot (`plot_strata_adams()` in R/stratum_stats.R, `analysis/10_strata_figure.R`;
+  output/strata_adams_style_michigan_{n,weight}.png): strata outlines in bottom depth x fishing depth,
+  crosshatch spacing ~ 1 / (mean SD over species)^2 (none below ~0.16), lakebed shaded.
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the

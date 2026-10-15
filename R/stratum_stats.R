@@ -78,3 +78,51 @@ combined_stats <- function(ss) {
               se_st = sqrt(sum(W^2 * sd_within^2 / tows_per_year)),
               se_st_all = sqrt(sum(W^2 * sd_all^2 / tows_per_year)))
 }
+
+# Diagonal hatch segments (both directions) clipped to a rectangle; c_grid shared by all cells so the hatching
+# runs continuously across neighbouring cells of a stratum
+hatch_cell <- function(x0, x1, y0, y1, spacing) {
+  cs <- seq(-400, 400, by = spacing)
+  up <- tibble(c = cs, xa = pmax(x0, y0 + c), xb = pmin(x1, y1 + c)) %>%
+    filter(xa < xb) %>% transmute(x = xa, y = xa - c, xend = xb, yend = xb - c)
+  dn <- tibble(c = cs, xa = pmax(x0, c - y1), xb = pmin(x1, c - y0)) %>%
+    filter(xa < xb) %>% transmute(x = xa, y = c - xa, xend = xb, yend = c - xb)
+  bind_rows(up, dn)
+}
+
+# Adams et al. (2006) Figure 4 style: strata in the water column (bottom depth x depth), crosshatching denser
+# where composition is more variable (mean over species of the SD of tow proportions), stratum outlines,
+# lakebed shaded. cells: cell, bd_bin, fd_bin, stratum_name; msd: stratum_name, mean_sd.
+plot_strata_adams <- function(cells, msd, cell_m = 20, title = NULL) {
+  d <- cells %>% left_join(msd, by = "stratum_name") %>%
+    mutate(x0 = bd_bin * cell_m, x1 = x0 + cell_m, y0 = fd_bin * cell_m, y1 = y0 + cell_m)
+  # spacing ~ 1 / SD^2 for contrast; none where spacing would exceed a cell (SD < ~0.16)
+  hatch <- pmap(d, \(x0, x1, y0, y1, mean_sd, ...) {
+    sp <- 0.5 / mean_sd^2
+    if (sp > cell_m) NULL else hatch_cell(x0, x1, y0, y1, sp)
+  }) %>% list_rbind()
+  key <- paste(d$bd_bin, d$fd_bin)
+  st_of <- setNames(as.character(d$stratum_name), key)
+  edge <- function(dx, dy) as.character(st_of[paste(d$bd_bin + dx, d$fd_bin + dy)])
+  edges <- bind_rows(
+    d %>% mutate(nb = edge(-1, 0)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y0, xend = x0, yend = y1),
+    d %>% mutate(nb = edge(1, 0)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x1, y = y0, xend = x1, yend = y1),
+    d %>% mutate(nb = edge(0, -1)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y0, xend = x1, yend = y0),
+    d %>% mutate(nb = edge(0, 1)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y1, xend = x1, yend = y1))
+  labs_df <- d %>% summarise(.by = c(stratum_name, mean_sd), x = mean((x0 + x1) / 2), y = mean((y0 + y1) / 2)) %>%
+    mutate(label = paste0(stratum_name, "\nmean SD ", sprintf("%.2f", mean_sd)))
+  xmax <- max(d$x1); ymax <- max(d$y1)
+  bed <- tibble(x = c(0, ymax, xmax, xmax, 0), y = c(0, ymax, ymax, ymax, ymax))
+  ggplot() +
+    geom_segment(data = hatch, aes(x, y, xend = xend, yend = yend), linewidth = 0.25, colour = "grey25") +
+    geom_polygon(data = tibble(x = c(0, ymax, 0), y = c(0, ymax, ymax)), aes(x, y), fill = "grey80") +
+    geom_segment(data = edges, aes(x, y, xend = xend, yend = yend), linewidth = 0.9) +
+    geom_abline(slope = 1, intercept = 0, colour = "grey40") +
+    geom_label(data = labs_df, aes(x, y, label = label), size = 3, linewidth = 0, fill = alpha("white", 0.85),
+               lineheight = 0.9) +
+    scale_y_reverse(expand = c(0, 0)) + scale_x_continuous(expand = c(0, 0)) +
+    coord_cartesian(xlim = c(0, xmax), ylim = c(ymax, 0)) +
+    labs(x = "Bottom depth (m)", y = "Fishing depth (m)", title = title,
+         caption = "Denser crosshatching = more variable catch composition (mean SD of tow proportions of alewife, smelt, bloater).\nGrey = below the lakebed. Outside the outlines: too few tows (< 5 tows with >= 10 fish per 20 m cell).") +
+    theme_bw(base_size = 11) + theme(panel.grid = element_blank(), plot.caption = element_text(hjust = 0))
+}
