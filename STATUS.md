@@ -113,8 +113,8 @@
   EchoNet2Fish's own species columns are 0 in those rows and interval/region totals equal the layer sums, so
   zeroing matches its estimates. Consequence: the deep stratum has fish_ha 0 in every row in 2004 and 2010 (no
   sigma at depth); 2015 68/157 rows with sigma, 2022 163/215. 2004 mean fish/ha: surface nearshore 397 (CV 2.4),
-  midwater 32, mid-lake 784, offshore 1,150, deep 0. ON HOLD (user, 2026-10-15): user is working out why so
-  many cells have no targets (many acoustic cells with no targets is normal); deep-layer treatment waits on that.
+  midwater 32, mid-lake 784, offshore 1,150, deep 0. Zero density is normal in Lake Michigan (user); NA/Inf = 0
+  stands as EchoNet2Fish does. Paused here (user, 2026-10-15).
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
