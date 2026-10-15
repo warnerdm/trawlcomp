@@ -101,14 +101,7 @@ plot_strata_adams <- function(cells, msd, cell_m = 20, title = NULL) {
     sp <- 0.5 / mean_sd^2
     if (sp > cell_m) NULL else hatch_cell(x0, x1, y0, y1, sp)
   }) %>% list_rbind()
-  key <- paste(d$bd_bin, d$fd_bin)
-  st_of <- setNames(as.character(d$stratum_name), key)
-  edge <- function(dx, dy) as.character(st_of[paste(d$bd_bin + dx, d$fd_bin + dy)])
-  edges <- bind_rows(
-    d %>% mutate(nb = edge(-1, 0)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y0, xend = x0, yend = y1),
-    d %>% mutate(nb = edge(1, 0)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x1, y = y0, xend = x1, yend = y1),
-    d %>% mutate(nb = edge(0, -1)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y0, xend = x1, yend = y0),
-    d %>% mutate(nb = edge(0, 1)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y1, xend = x1, yend = y1))
+  edges <- strata_edges(d)
   labs_df <- d %>% summarise(.by = c(stratum_name, mean_sd), x = mean((x0 + x1) / 2), y = mean((y0 + y1) / 2)) %>%
     mutate(label = paste0(stratum_name, "\nmean SD ", sprintf("%.2f", mean_sd)))
   xmax <- max(d$x1); ymax <- max(d$y1)
@@ -125,4 +118,42 @@ plot_strata_adams <- function(cells, msd, cell_m = 20, title = NULL) {
     labs(x = "Bottom depth (m)", y = "Fishing depth (m)", title = title,
          caption = "Denser crosshatching = more variable catch composition (mean SD of tow proportions of alewife, smelt, bloater).\nGrey = below the lakebed. Outside the outlines: too few tows (< 5 tows with >= 10 fish per 20 m cell).") +
     theme_bw(base_size = 11) + theme(panel.grid = element_blank(), plot.caption = element_text(hjust = 0))
+}
+
+# Outline segments between cells of different strata (or no stratum). d: bd_bin, fd_bin, stratum_name, x0, x1, y0, y1
+strata_edges <- function(d) {
+  st_of <- setNames(as.character(d$stratum_name), paste(d$bd_bin, d$fd_bin))
+  edge <- function(dx, dy) as.character(st_of[paste(d$bd_bin + dx, d$fd_bin + dy)])
+  bind_rows(
+    d %>% mutate(nb = edge(-1, 0)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y0, xend = x0, yend = y1),
+    d %>% mutate(nb = edge(1, 0)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x1, y = y0, xend = x1, yend = y1),
+    d %>% mutate(nb = edge(0, -1)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y0, xend = x1, yend = y0),
+    d %>% mutate(nb = edge(0, 1)) %>% filter(is.na(nb) | nb != stratum_name) %>% transmute(x = x0, y = y1, xend = x1, yend = y1))
+}
+
+# Every tow with fish as a point (bottom depth x fishing depth, slight jitter), coloured by stratum or by why
+# it was left out, with the stratum outlines. pts: bottom_depth, fishing_depth, status (factor).
+plot_tows_strata <- function(pts, cells, cell_m = 20, title = NULL) {
+  d <- cells %>% mutate(x0 = bd_bin * cell_m, x1 = x0 + cell_m, y0 = fd_bin * cell_m, y1 = y0 + cell_m)
+  ymax <- max(d$y1, pts$fishing_depth, na.rm = TRUE)
+  ymax <- ceiling(ymax / cell_m) * cell_m + 2   # room for tows at the last grid line
+  xmax <- ceiling(max(pts$bottom_depth, na.rm = TRUE) / cell_m) * cell_m
+  cols <- c("Surface nearshore" = "#1b9e77", "Midwater nearshore" = "#d95f02", "Surface offshore" = "#7570b3",
+            "Deep" = "#e7298a", "Cell < 5 tows" = "grey20", "< 10 fish" = "grey60")
+  shp <- c("Surface nearshore" = 16, "Midwater nearshore" = 16, "Surface offshore" = 16, "Deep" = 16,
+           "Cell < 5 tows" = 4, "< 10 fish" = 1)
+  ggplot(pts, aes(bottom_depth, fishing_depth)) +
+    geom_polygon(data = tibble(x = c(0, ymax, 0), y = c(0, ymax, ymax)), aes(x, y), fill = "grey88") +
+    geom_vline(xintercept = seq(0, xmax, cell_m), colour = "grey92", linewidth = 0.3) +
+    geom_hline(yintercept = seq(0, ymax, cell_m), colour = "grey92", linewidth = 0.3) +
+    geom_jitter(aes(colour = status, shape = status), width = 1, height = 0.5, size = 1.4, alpha = 0.75) +
+    geom_segment(data = strata_edges(d), aes(x, y, xend = xend, yend = yend), linewidth = 0.8) +
+    scale_colour_manual(values = cols, name = NULL, drop = FALSE) +
+    scale_shape_manual(values = shp, name = NULL, drop = FALSE) +
+    scale_y_reverse(expand = c(0, 0)) + scale_x_continuous(expand = c(0, 0), breaks = seq(0, xmax, 40)) +
+    coord_cartesian(xlim = c(0, xmax), ylim = c(ymax, 0)) +
+    labs(x = "Bottom depth (m)", y = "Fishing depth (m)", title = title,
+         caption = "Points jittered slightly (1 m across, 0.5 m down). Thin grid = 20 m cells; thick lines = strata. Grey = below the lakebed.") +
+    theme_bw(base_size = 11) + theme(panel.grid = element_blank(), legend.position = "bottom",
+                                     plot.caption = element_text(hjust = 0))
 }
