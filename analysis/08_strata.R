@@ -3,11 +3,14 @@ suppressWarnings(suppressMessages(source("D:/pyprojects/trawlcomp/R/strata.R")))
 library(patchwork)
 
 CELL_M <- 20
+MIN_FISH <- 10   # fish (by number) per tow; 0 = Adams et al. (all tows)
+OUT_TAG <- if (MIN_FISH > 0) paste0("_min", MIN_FISH, "fish") else ""
 tows <- drop_bad_coordinates(select_tows()) %>% filter(lake == "Michigan")
+n_fish <- tow_catch(tows, "N") %>% select(OP_ID, n_fish = n)
 options(width = 200)
 all_summ <- list()
 for (m in c("N", "WEIGHT")) {
-  tc <- tow_cells(tow_catch(tows, m), cell_m = CELL_M)
+  tc <- tow_cells(left_join(tow_catch(tows, m), n_fish, by = "OP_ID"), cell_m = CELL_M, min_fish = MIN_FISH)
   cs_all <- cell_stats(tc)
   blk <- main_block(cs_all)
   cs <- blk$cells
@@ -23,13 +26,13 @@ for (m in c("N", "WEIGHT")) {
     cat("k =", k, "\n"); print(as.data.frame(mutate(s, across(where(is.double), \(x) round(x, 2)))))
     plots[[k - 1]] <- plot_strata(cs, st, CELL_M, paste(k, "strata"))
   }
-  ggsave(file.path(OUTPUT_DIR, paste0("strata_michigan_", tolower(m), ".png")),
+  ggsave(file.path(OUTPUT_DIR, paste0("strata_michigan_", tolower(m), OUT_TAG, ".png")),
          wrap_plots(plots, ncol = 3) + plot_annotation(title = paste0("Lake Michigan depth strata (Adams et al. 2006 method), proportions by ",
-                                                                        if (m == "N") "number" else "weight", "; labels = tows per cell")),
+                                                                        if (m == "N") "number" else "weight", if (MIN_FISH > 0) paste0(", tows with >= ", MIN_FISH, " fish") else "", "; labels = tows per cell")),
          width = 14, height = 8, dpi = 150)
-  png(file.path(OUTPUT_DIR, paste0("strata_tree_michigan_", tolower(m), ".png")), width = 1400, height = 700, res = 130)
+  png(file.path(OUTPUT_DIR, paste0("strata_tree_michigan_", tolower(m), OUT_TAG, ".png")), width = 1400, height = 700, res = 130)
   plot(structure(tree, class = "hclust"), labels = paste0(cs$bd_bin * CELL_M, "/", cs$fd_bin * CELL_M), main = paste("Constrained complete-linkage tree,", m),
        xlab = "Cell (bottom depth / fishing depth, m, lower edges)", sub = "")
   dev.off()
 }
-write_csv(list_rbind(all_summ), file.path(OUTPUT_DIR, "strata_michigan_summary.csv"))
+write_csv(list_rbind(all_summ), file.path(OUTPUT_DIR, paste0("strata_michigan_summary", OUT_TAG, ".csv")))

@@ -12,10 +12,13 @@ library(adespatial)
 
 STRATA_GROUPS <- c("alewife", "smelt", "bloater")
 
-# Per-tow proportions with grid cell indices
-tow_cells <- function(catch, cell_m = 20, groups = STRATA_GROUPS) {
+# Per-tow proportions with grid cell indices. min_fish: minimum number of fish of the groups in the tow
+# (counted by number even when the proportions are by weight; n_fish column), so tiny catches whose
+# proportions can only be near 0 or 1 do not drive the cell SDs (user, 2026-10-15: 10; Adams et al. used
+# all tows with complete catch data).
+tow_cells <- function(catch, cell_m = 20, groups = STRATA_GROUPS, min_fish = 0) {
   catch %>%
-    filter(!is.na(n) & n > 0 & !is.na(fishing_depth) & !is.na(bottom_depth)) %>%
+    filter(!is.na(n) & n > 0 & !is.na(fishing_depth) & !is.na(bottom_depth) & n_fish >= min_fish) %>%
     mutate(across(all_of(groups), \(x) x / n),
            bd_bin = floor(bottom_depth / cell_m), fd_bin = floor(fishing_depth / cell_m),
            cell = paste(bd_bin, fd_bin, sep = "_"))
