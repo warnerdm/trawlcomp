@@ -14,13 +14,15 @@ for (meas in c("N", "WEIGHT")) {
          width = 9, height = 5.2, dpi = 150)
 }
 
-# All tows with fish as points: in a stratum, or left out (< 10 fish; cell with < 5 such tows)
+# All tows with fish as points: in a stratum, or left out (too few fish; cell with too few such tows)
 pts <- tow_catch(tows, "N") %>%
   filter(n > 0 & !is.na(bottom_depth) & !is.na(fishing_depth)) %>%
   left_join(select(ts, OP_ID, stratum_name), by = "OP_ID") %>%
   mutate(status = factor(case_when(!is.na(stratum_name) ~ as.character(stratum_name),
-                                   n < 10 ~ "< 10 fish", TRUE ~ "Cell < 5 tows"),
-                         c(levels(ts$stratum_name), "Cell < 5 tows", "< 10 fish")))
+                                   n < MI_STRATA_MIN_FISH ~ paste("<", MI_STRATA_MIN_FISH, "fish"),
+                                   TRUE ~ paste("Cell <", MI_STRATA_MIN_TOWS, "tows")),
+                         c(levels(ts$stratum_name), paste("Cell <", MI_STRATA_MIN_TOWS, "tows"),
+                           paste("<", MI_STRATA_MIN_FISH, "fish"))))
 print(count(pts, status))
-p <- plot_tows_strata(pts, cells, title = paste0("Lake Michigan tows (", nrow(pts), " with fish) and the 4 strata"))
+p <- plot_tows_strata(pts, cells, title = paste0("Lake Michigan tows (", nrow(pts), " with fish) and the ", nlevels(ts$stratum_name), " strata"))
 ggsave(file.path(OUTPUT_DIR, "strata_tows_michigan.png"), p, width = 10, height = 6, dpi = 150)

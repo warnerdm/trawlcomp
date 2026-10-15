@@ -1,6 +1,6 @@
 # Mean proportion, SD and SE of each species' tow proportion within depth strata (design-based framework).
-# Strata: Adams et al. (2006) clustering of Lake Michigan cells (strata.R), here k = 4 from tows with >= 10 fish
-# and cells with >= 5 tows (user, 2026-10-15). The strata are defined once, by number, and used for both
+# Strata: Adams et al. (2006) clustering of Lake Michigan cells (strata.R), here k = 5 from tows with >= 5 fish
+# and cells with >= 5 tows (user, 2026-10-15; earlier k = 4 with >= 10 fish). The strata are defined once, by number, and used for both
 # number and weight proportions.
 # Per stratum and species:
 #   mean_p     mean of the tow proportions (every tow equal, as Adams et al.)
@@ -20,7 +20,12 @@
 source("D:/pyprojects/trawlcomp/R/strata.R")
 
 # Tow -> stratum for Lake Michigan (k strata), with descriptive names
-michigan_strata <- function(tows, k = 4, cell_m = 20, min_fish = 10, min_tows = 5) {
+MI_STRATA_K <- 5
+MI_STRATA_MIN_FISH <- 5
+MI_STRATA_MIN_TOWS <- 5
+
+michigan_strata <- function(tows, k = MI_STRATA_K, cell_m = 20, min_fish = MI_STRATA_MIN_FISH,
+                            min_tows = MI_STRATA_MIN_TOWS) {
   catch <- tow_catch(tows, "N") %>% mutate(n_fish = n)
   tc <- tow_cells(catch, cell_m = cell_m, min_fish = min_fish)
   cs <- main_block(cell_stats(tc, min_tows = min_tows))$cells
@@ -33,18 +38,24 @@ michigan_strata <- function(tows, k = 4, cell_m = 20, min_fish = 10, min_tows = 
     select(OP_ID, cell, stratum, s_bloater, s_bd, s_fd, cells)
 }
 
-# Names for the 4 strata: deep = most bloater; surface offshore = deepest bottom of the rest; midwater
-# nearshore = deepest fishing of the remaining two; the last = surface nearshore
+# Names: deep = most bloater; then, among the rest by mean bottom depth, the deepest = surface offshore and
+# (k = 5) the next = surface mid-lake; of the last two, the deeper fishing = midwater nearshore, the other =
+# surface nearshore
+STRATUM_LEVELS <- c("Surface nearshore", "Midwater nearshore", "Surface mid-lake", "Surface offshore", "Deep")
+
 name_strata <- function(ts) {
   s <- distinct(ts, stratum, s_bloater, s_bd, s_fd, cells)
-  deep <- s$stratum[which.max(s$s_bloater)]
-  r <- filter(s, stratum != deep)
-  off <- r$stratum[which.max(r$s_bd)]
-  r <- filter(r, stratum != off)
-  mid <- r$stratum[which.max(r$s_fd)]
-  near <- setdiff(r$stratum, mid)
-  lv <- c("Surface nearshore", "Midwater nearshore", "Surface offshore", "Deep")
-  key <- setNames(lv, c(near, mid, off, deep))
+  key <- c()
+  deep <- s$stratum[which.max(s$s_bloater)]; key[as.character(deep)] <- "Deep"
+  r <- filter(s, stratum != deep) %>% arrange(desc(s_bd))
+  key[as.character(r$stratum[1])] <- "Surface offshore"
+  r <- r[-1, ]
+  if (nrow(r) == 3) { key[as.character(r$stratum[1])] <- "Surface mid-lake"; r <- r[-1, ] }
+  stopifnot(nrow(r) == 2)
+  r <- arrange(r, desc(s_fd))
+  key[as.character(r$stratum[1])] <- "Midwater nearshore"
+  key[as.character(r$stratum[2])] <- "Surface nearshore"
+  lv <- intersect(STRATUM_LEVELS, key)
   mutate(ts, stratum_name = factor(key[as.character(stratum)], lv))
 }
 
@@ -116,7 +127,7 @@ plot_strata_adams <- function(cells, msd, cell_m = 20, title = NULL) {
     scale_y_reverse(expand = c(0, 0)) + scale_x_continuous(expand = c(0, 0)) +
     coord_cartesian(xlim = c(0, xmax), ylim = c(ymax, 0)) +
     labs(x = "Bottom depth (m)", y = "Fishing depth (m)", title = title,
-         caption = "Denser crosshatching = more variable catch composition (mean SD of tow proportions of alewife, smelt, bloater).\nGrey = below the lakebed. Outside the outlines: too few tows (< 5 tows with >= 10 fish per 20 m cell).") +
+         caption = paste0("Denser crosshatching = more variable catch composition (mean SD of tow proportions of alewife, smelt, bloater).\nGrey = below the lakebed. Outside the outlines: too few tows (< ", MI_STRATA_MIN_TOWS, " tows with >= ", MI_STRATA_MIN_FISH, " fish per 20 m cell).")) +
     theme_bw(base_size = 11) + theme(panel.grid = element_blank(), plot.caption = element_text(hjust = 0))
 }
 
@@ -138,10 +149,11 @@ plot_tows_strata <- function(pts, cells, cell_m = 20, title = NULL) {
   ymax <- max(d$y1, pts$fishing_depth, na.rm = TRUE)
   ymax <- ceiling(ymax / cell_m) * cell_m + 2   # room for tows at the last grid line
   xmax <- ceiling(max(pts$bottom_depth, na.rm = TRUE) / cell_m) * cell_m
-  cols <- c("Surface nearshore" = "#1b9e77", "Midwater nearshore" = "#d95f02", "Surface offshore" = "#7570b3",
-            "Deep" = "#e7298a", "Cell < 5 tows" = "grey20", "< 10 fish" = "grey60")
-  shp <- c("Surface nearshore" = 16, "Midwater nearshore" = 16, "Surface offshore" = 16, "Deep" = 16,
-           "Cell < 5 tows" = 4, "< 10 fish" = 1)
+  few <- paste("<", MI_STRATA_MIN_FISH, "fish"); thin <- paste("Cell <", MI_STRATA_MIN_TOWS, "tows")
+  cols <- c("Surface nearshore" = "#1b9e77", "Midwater nearshore" = "#d95f02", "Surface mid-lake" = "#66a61e",
+            "Surface offshore" = "#7570b3", "Deep" = "#e7298a", setNames(c("grey20", "grey60"), c(thin, few)))
+  shp <- c("Surface nearshore" = 16, "Midwater nearshore" = 16, "Surface mid-lake" = 16, "Surface offshore" = 16,
+           "Deep" = 16, setNames(c(4, 1), c(thin, few)))
   ggplot(pts, aes(bottom_depth, fishing_depth)) +
     geom_polygon(data = tibble(x = c(0, ymax, 0), y = c(0, ymax, ymax)), aes(x, y), fill = "grey88") +
     geom_vline(xintercept = seq(0, xmax, cell_m), colour = "grey92", linewidth = 0.3) +

@@ -94,6 +94,14 @@
   Year effects (one-way ANOVA within stratum, by number): significant in surface nearshore (year 10-20% of
   variance; bloater +0.09 / decade, smelt -0.08) and midwater nearshore bloater (44%; +0.26 / decade, smelt
   -0.28); none in deep. Pooling years is fine for SDs (5-10% larger), not for nearshore means.
+- Stratum statistics switched to 5 strata from tows with >= 5 fish, cells >= 5 tows (user, 2026-10-15;
+  stratum_stats.R MI_STRATA_K / MI_STRATA_MIN_FISH / MI_STRATA_MIN_TOWS; analyses 09 and 10 rerun). Strata and
+  tows (per year): surface nearshore 308 (15), midwater nearshore 54 (2), surface mid-lake 87 (5; surface over
+  100-160 m bottom), surface offshore 20 (1), deep 55 (3). By number, mean / within-year SD / SE now:
+  nearshore alewife 0.74 / 0.34 / 0.09, smelt 0.17 / 0.29 / 0.08, bloater 0.09 / 0.23 / 0.06; midwater
+  alewife 0.47 / 0.38 / 0.27, smelt 0.31 / 0.35 / 0.25, bloater 0.22 / 0.26 / 0.18; mid-lake alewife 0.61 /
+  0.33 / 0.15, bloater 0.25 / 0.29 / 0.13, smelt 0.14 / 0.24 / 0.11; offshore alewife 0.85 / 0.26 / 0.26;
+  deep bloater 0.98 / 0.08 / 0.05. Earlier 4-strata numbers above are superseded.
 - Adams Figure 4 style plot (`plot_strata_adams()` in R/stratum_stats.R, `analysis/10_strata_figure.R`;
   output/strata_adams_style_michigan_{n,weight}.png): strata outlines in bottom depth x fishing depth,
   crosshatch spacing ~ 1 / (mean SD over species)^2 (none below ~0.16), lakebed shaded.

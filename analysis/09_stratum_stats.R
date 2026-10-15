@@ -18,7 +18,8 @@ write_csv(ss, file.path(OUTPUT_DIR, "stratum_stats_michigan.csv"))
 write_csv(cb, file.path(OUTPUT_DIR, "stratum_combined_michigan.csv"))
 
 options(width = 220)
-cat("Tows per stratum (>= 10 fish, cells with >= 5 tows):\n")
+cat("Tows per stratum (>=", MI_STRATA_MIN_FISH, "fish, cells with >=", MI_STRATA_MIN_TOWS, "tows):
+")
 print(ts %>% count(stratum_name, cells))
 print(as.data.frame(ss %>% select(measure, stratum_name, group, tows, tows_per_year, mean_p, sd_within, se_now,
                                   ratio_p, sd_ratio_within, se_ratio_now) %>%
@@ -27,7 +28,7 @@ cat("\nCombined over strata (W = share of cells):\n")
 print(as.data.frame(mutate(cb, across(where(is.double), \(x) round(x, 3)))))
 
 # SE vs tows per stratum: within-year SD (solid) and all-years SD (dashed); points = current tows per year
-lv <- c("alewife", "smelt", "bloater")
+lv <- c("alewife", "smelt", "bloater")  # species order
 curves <- ss %>%
   cross_join(tibble(m = 1:40)) %>%
   transmute(measure, stratum_name, group = factor(group, lv), m,
@@ -47,5 +48,5 @@ for (meas in c("N", "WEIGHT")) {
          subtitle = "Points = current median tows per year (within-year SD)") +
     theme_bw(base_size = 11) +
     theme(strip.background = element_rect(fill = "grey92"), legend.position = "bottom")
-  ggsave(file.path(OUTPUT_DIR, paste0("stratum_se_michigan_", tolower(meas), ".png")), p, width = 13, height = 4.6, dpi = 150)
+  ggsave(file.path(OUTPUT_DIR, paste0("stratum_se_michigan_", tolower(meas), ".png")), p, width = 15, height = 4.6, dpi = 150)
 }
