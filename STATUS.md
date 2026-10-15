@@ -67,7 +67,11 @@
   over 60-120 m, bloater 0.99 (0.04); (4) surface over 160-200 m bottom, alewife 0.89. k = 5 splits the surface
   over 100-160 m bottom. With >= 3 tows per cell instead (user, 2026-10-15; script now MIN_TOWS = 3; outputs
   _min10fish_min3tows): 458 tows, 23 cells; single 3-tow cells peel off again (20-40 m over 120-140 and 140-160 m
-  bottom; surface over 220-240 m) and the mixed midwater-nearshore stratum appears only at k = 7. Adams Table 4 (1994-95): 0.71/0.18/0.06; 0.40/0.20/0.38; offshore alewife 0.93; deep
+  bottom; surface over 220-240 m) and the mixed midwater-nearshore stratum appears only at k = 7.
+  >= 5 fish, >= 5 tows (08_strata.R now takes MIN_FISH / MIN_TOWS env vars, defaults 10 / 5; outputs
+  _min5fish_min5tows): 555 tows, 524 in 19 cells. Deep 55 tows (bloater 0.98, SD 0.08). k = 4 splits the surface
+  over 100-160 m bottom (87 tows; bloater 0.25, SD 0.38) before the midwater nearshore stratum (k = 5: 54 tows,
+  0.47 / 0.31 / 0.22). Stratum statistics (09) still use the 10-fish, 5-tow 4 strata. Adams Table 4 (1994-95): 0.71/0.18/0.06; 0.40/0.20/0.38; offshore alewife 0.93; deep
   bloater 0.90.
 - Stratum framework (user, 2026-10-15: not for survey design; a framework for mean, SD and SE of proportions
   across tows). `R/stratum_stats.R`, `analysis/09_stratum_stats.R`; output/stratum_stats_michigan.csv,
