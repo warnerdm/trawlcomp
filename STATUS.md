@@ -65,6 +65,17 @@
   _min10fish_min3tows): 458 tows, 23 cells; single 3-tow cells peel off again (20-40 m over 120-140 and 140-160 m
   bottom; surface over 220-240 m) and the mixed midwater-nearshore stratum appears only at k = 7. Adams Table 4 (1994-95): 0.71/0.18/0.06; 0.40/0.20/0.38; offshore alewife 0.93; deep
   bloater 0.90.
+- Stratum framework (user, 2026-10-15: not for survey design; a framework for mean, SD and SE of proportions
+  across tows). `R/stratum_stats.R`, `analysis/09_stratum_stats.R`; output/stratum_stats_michigan.csv,
+  stratum_combined_michigan.csv, stratum_se_michigan_{n,weight}.png. The 4 strata (>= 10 fish, >= 5 tows per
+  cell, defined by number, used for both measures): surface nearshore 340 tows (15/yr), midwater nearshore 49
+  (2/yr), surface offshore 17 (1/yr), deep 39 (2/yr). Mean of tow proportions, catch-weighted ratio, SD over all
+  tows, pooled within-year SD, SE at current effort. By number, within-year SD / SE now: surface nearshore
+  alewife 0.35 / 0.09, smelt 0.29 / 0.07, bloater 0.25 / 0.06; midwater nearshore 0.39 / 0.28, 0.36 / 0.26,
+  0.27 / 0.19; surface offshore alewife 0.17 (df 5, unstable); deep bloater 0.04 / 0.03 (weight: 1.00, SD 0).
+  Within-year SD only slightly below all-years SD. Combined with W = share of cells: alewife 0.54 (SE 0.067),
+  bloater 0.31 (0.049), smelt 0.15 (0.056). Ratio and mean-of-proportions differ in surface nearshore (alewife
+  0.85 vs 0.72): big catches are alewife.
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
