@@ -105,6 +105,15 @@
 - Adams Figure 4 style plot (`plot_strata_adams()` in R/stratum_stats.R, `analysis/10_strata_figure.R`;
   output/strata_adams_style_michigan_{n,weight}.png): strata outlines in bottom depth x fishing depth,
   crosshatch spacing ~ 1 / (mean SD over species)^2 (none below ~0.16), lakebed shaded.
+- EchoNet2Fish acoustic output (user, 2026-10-15): D:/Acoustics/EchoNet2Fish_LM/MI<year>/ ... intlaymeans_nph ...csv,
+  interval x 10 m layer (layer depth = depth below surface, user) with Sv_mean, PRC_ABC, sigma, nv, fish_ha and
+  species/size densities; 2004-2024 (no 2020). `R/acoustic.R` (read_intlay, assign_strata to the 20 m cells),
+  `analysis/11_acoustic_fish_ha.R` (YEAR env var; output/acoustic_fish_ha_{strata,cells,box}_<year>).
+  fish_ha NA/Inf set to 0 (user). 2004: 2,029 rows, 1,211 Inf (all have Sv: backscatter but sigma 0), 349 NA.
+  EchoNet2Fish's own species columns are 0 in those rows and interval/region totals equal the layer sums, so
+  zeroing matches its estimates. Consequence: the deep stratum has fish_ha 0 in every row in 2004 and 2010 (no
+  sigma at depth); 2015 68/157 rows with sigma, 2022 163/215. 2004 mean fish/ha: surface nearshore 397 (CV 2.4),
+  midwater 32, mid-lake 784, offshore 1,150, deep 0. Open: how to treat deep layers without sigma.
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
