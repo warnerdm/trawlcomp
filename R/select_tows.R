@@ -19,7 +19,8 @@ tow_fields <- function(d, lake) {
   num <- \(x) suppressWarnings(as.numeric(x))
   transmute(d, OP_ID = as.integer(OP_ID), lake = lake, YEAR = as.integer(YEAR), VESSEL = as.integer(VESSEL),
             transect = str_trim(as.character(TRANSECT)), time = as.integer(TIME),
-            bottom_depth = rowMeans(cbind(num(BEG_DEPTH), num(END_DEPTH)), na.rm = TRUE),
+            # a depth of 0 means not recorded (2019 vessel 17 END_DEPTH; checked against pydt4 acoustic bottom)
+            bottom_depth = rowMeans(cbind(na_if(num(BEG_DEPTH), 0), na_if(num(END_DEPTH), 0)), na.rm = TRUE),
             fishing_depth = num(FISHING_DEPTH),
             lat = num(BEG_LATITUDE_DD), lon = num(BEG_LONGITUDE_DD))
 }

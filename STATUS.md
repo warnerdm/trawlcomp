@@ -29,6 +29,10 @@
   ALEWIFE_CONTAMINATION_DEPTH_M): 992 fish in 42 Michigan tows (+1 Huron); 7 Michigan tows held only alewife and
   drop out (58086, 58104, 79137, 83153, 85929, 87181, 89419). 58104 (2005 v88, 60.4 m, 279 alewife only) is odd:
   check its fishing depth. tow_catch(measure = "N" | "WEIGHT"); weight missing for 38 Michigan tows.
+- Bottom depth 0 = not recorded (all 11 2019 vessel 17 tows have END_DEPTH 0; found by comparing with pydt4's
+  acoustic bottom for 77 Michigan tows: median difference 0.3 m, IQR -1 to +2 m; 112424/112426 had been halved).
+  select_tows treats 0 as NA. All analyses rerun 2026-10-15; strata: surface nearshore 339, midwater 49,
+  offshore 18, deep 41 tows; numbers changed by <= 0.02. No further bottom checking (user).
 - Composition plots (`R/composition_plots.R`, `analysis/02_composition_plots.R`): fishing depth is the main
   gradient (MI alewife -> bloater ~25-45 m; HU smelt -> bloater ~30-40 m); spatial patterns too.
 - Models (`R/fit_models.R`, `analysis/03_fit_models.R`; output/model_summary.csv, repeat_tow_stats.csv): one
