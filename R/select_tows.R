@@ -7,6 +7,7 @@ library(tidyverse)
 source("D:/pyprojects/trawlcomp/R/paths.R")
 
 ACOUSTIC_TARGETS <- c(209, 210)
+MI_BAD_BOTTOM_DEPTH <- c(77542, 104167)
 
 read_trawl <- function(f, ...) {
   read_csv(file.path(TRAWL_DIR, f), show_col_types = FALSE, guess_max = 1e6, ...)
@@ -27,7 +28,12 @@ select_tows <- function() {
   mi <- list.files(TRAWL_DIR, pattern = "^L_2_Y_\\d{4}_Acoustic_optrop\\.csv$", full.names = TRUE) %>%
     map(\(f) read_csv(f, show_col_types = FALSE, col_types = cols(.default = "c"))) %>%
     list_rbind() %>%
-    tow_fields("Michigan")
+    tow_fields("Michigan") %>%
+    # As bloaterTS (manuscript Rmd, R/bloater-cut-length.R): 2008 Steelhead (vessel 17) bottom depths are in
+    # feet (checked against pydt4 bottom detection for 78103, 78105, 78110; fishing depths are metres);
+    # 77542 (284 m at both ends) and 104167 (30.4 vs 333 m) have implausible bottom depths
+    mutate(bottom_depth = if_else(YEAR == 2008 & VESSEL == 17, bottom_depth * 0.3048, bottom_depth),
+           bottom_depth = if_else(OP_ID %in% MI_BAD_BOTTOM_DEPTH, NA_real_, bottom_depth))
 
   acoustic_ops <- read_trawl("OP_TARGET.csv") %>%
     filter(TARGET %in% ACOUSTIC_TARGETS) %>%
