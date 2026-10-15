@@ -19,23 +19,50 @@
 #   p_st = sum W_h mean_p_h, se_st = sqrt(sum W_h^2 sd_within_h^2 / m_h) with m_h = median tows per year.
 source("D:/pyprojects/trawlcomp/R/strata.R")
 
-# Tow -> stratum for Lake Michigan (k strata), with descriptive names
+# Strata settings per lake (user, 2026-10-15): Michigan 5 strata, Huron 5 strata; both from tows with >= 5 fish
+# and cells with >= 5 tows. Huron clusters on alewife, smelt, bloater and other.
 MI_STRATA_K <- 5
 MI_STRATA_MIN_FISH <- 5
 MI_STRATA_MIN_TOWS <- 5
+LAKE_STRATA <- list(
+  Michigan = list(k = 5, min_fish = 5, min_tows = 5, groups = STRATA_GROUPS),
+  Huron    = list(k = 5, min_fish = 5, min_tows = 5, groups = c(STRATA_GROUPS, "other"))
+)
 
-michigan_strata <- function(tows, k = MI_STRATA_K, cell_m = 20, min_fish = MI_STRATA_MIN_FISH,
-                            min_tows = MI_STRATA_MIN_TOWS) {
-  catch <- tow_catch(tows, "N") %>% mutate(n_fish = n)
-  tc <- tow_cells(catch, cell_m = cell_m, min_fish = min_fish)
-  cs <- main_block(cell_stats(tc, min_tows = min_tows))$cells
-  st <- cutree(cluster_cells(cs), k = k)
+# Tow -> stratum for one lake's tows (k strata)
+lake_strata <- function(tows, lake, cell_m = 20) {
+  cfg <- LAKE_STRATA[[lake]]
+  catch <- tow_catch(filter(tows, lake == !!lake), "N") %>% mutate(n_fish = n)
+  tc <- tow_cells(catch, cell_m = cell_m, groups = cfg$groups, min_fish = cfg$min_fish)
+  cs <- main_block(cell_stats(tc, groups = cfg$groups, min_tows = cfg$min_tows))$cells
+  st <- cutree(cluster_cells(cs, groups = cfg$groups), k = cfg$k)
   cell_st <- tibble(cell = cs$cell, stratum = st)
   tc %>%
     inner_join(cell_st, by = "cell") %>%
     mutate(.by = stratum, s_bloater = mean(bloater), s_bd = mean(bottom_depth), s_fd = mean(fishing_depth),
            cells = n_distinct(cell)) %>%
     select(OP_ID, cell, stratum, s_bloater, s_bd, s_fd, cells)
+}
+
+michigan_strata <- function(tows, cell_m = 20) lake_strata(tows, "Michigan", cell_m)
+
+# Names from each stratum's cell ranges, e.g. "Fishing 0-40 m, bottom 0-40 m" (used for Huron), ordered by
+# fishing then bottom depth
+range_names <- function(ts, cell_m = 20) {
+  r <- ts %>% distinct(stratum, cell) %>%
+    separate(cell, c("bd", "fd"), sep = "_", convert = TRUE) %>%
+    summarise(.by = stratum, fd0 = min(fd) * cell_m, fd1 = (max(fd) + 1) * cell_m,
+              bd0 = min(bd) * cell_m, bd1 = (max(bd) + 1) * cell_m) %>%
+    arrange(fd0, fd1, bd0) %>%
+    mutate(name = paste0("Fishing ", fd0, "-", fd1, " m, bottom ", bd0, "-", bd1, " m"))
+  key <- setNames(r$name, r$stratum)
+  mutate(ts, stratum_name = factor(key[as.character(stratum)], r$name))
+}
+
+# Named strata for a lake: Michigan descriptive names, others range names
+named_strata <- function(tows, lake) {
+  ts <- lake_strata(tows, lake)
+  if (lake == "Michigan") name_strata(ts) else range_names(ts)
 }
 
 # Names: deep = most bloater; then, among the rest by mean bottom depth, the deepest = surface offshore and
@@ -127,7 +154,7 @@ plot_strata_adams <- function(cells, msd, cell_m = 20, title = NULL) {
     scale_y_reverse(expand = c(0, 0)) + scale_x_continuous(expand = c(0, 0)) +
     coord_cartesian(xlim = c(0, xmax), ylim = c(ymax, 0)) +
     labs(x = "Bottom depth (m)", y = "Fishing depth (m)", title = title,
-         caption = paste0("Denser crosshatching = more variable catch composition (mean SD of tow proportions of alewife, smelt, bloater).\nGrey = below the lakebed. Outside the outlines: too few tows (< ", MI_STRATA_MIN_TOWS, " tows with >= ", MI_STRATA_MIN_FISH, " fish per 20 m cell).")) +
+         caption = paste0("Denser crosshatching = more variable catch composition (mean SD of tow proportions over the species groups).\nGrey = below the lakebed. Outside the outlines: too few tows (< ", MI_STRATA_MIN_TOWS, " tows with >= ", MI_STRATA_MIN_FISH, " fish per 20 m cell).")) +
     theme_bw(base_size = 11) + theme(panel.grid = element_blank(), plot.caption = element_text(hjust = 0))
 }
 
@@ -150,10 +177,10 @@ plot_tows_strata <- function(pts, cells, cell_m = 20, title = NULL) {
   ymax <- ceiling(ymax / cell_m) * cell_m + 2   # room for tows at the last grid line
   xmax <- ceiling(max(pts$bottom_depth, na.rm = TRUE) / cell_m) * cell_m
   few <- paste("<", MI_STRATA_MIN_FISH, "fish"); thin <- paste("Cell <", MI_STRATA_MIN_TOWS, "tows")
-  cols <- c("Surface nearshore" = "#1b9e77", "Midwater nearshore" = "#d95f02", "Surface mid-lake" = "#66a61e",
-            "Surface offshore" = "#7570b3", "Deep" = "#e7298a", setNames(c("grey20", "grey60"), c(thin, few)))
-  shp <- c("Surface nearshore" = 16, "Midwater nearshore" = 16, "Surface mid-lake" = 16, "Surface offshore" = 16,
-           "Deep" = 16, setNames(c(4, 1), c(thin, few)))
+  strata_lv <- setdiff(levels(pts$status), c(thin, few))
+  cols <- c(setNames(c("#1b9e77", "#d95f02", "#66a61e", "#7570b3", "#e7298a", "#e6ab02", "#a6761d")[seq_along(strata_lv)],
+                     strata_lv), setNames(c("grey20", "grey60"), c(thin, few)))
+  shp <- c(setNames(rep(16, length(strata_lv)), strata_lv), setNames(c(4, 1), c(thin, few)))
   ggplot(pts, aes(bottom_depth, fishing_depth)) +
     geom_polygon(data = tibble(x = c(0, ymax, 0), y = c(0, ymax, ymax)), aes(x, y), fill = "grey88") +
     geom_vline(xintercept = seq(0, xmax, cell_m), colour = "grey92", linewidth = 0.3) +

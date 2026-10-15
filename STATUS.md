@@ -124,7 +124,16 @@
   fishing depth 40 m: shallow (332 tows) smelt 0.67, bloater 0.21, other 0.11; deep (40-80 m over 40-120 m bottom,
   83 tows) bloater 0.74 (SD 0.31), smelt 0.20. k = 3 peels off one 7-tow cell (surface over 120-140 m); k = 4 20-40 m
   over 80-120 m (smelt 0.80); k = 5 splits shallow by bottom depth: 0-40 m bottom (smelt 0.79) vs 40-120 m (smelt
-  0.60, bloater 0.26); k = 6 splits deep at 60 m (40-60 m bloater 0.66; 60-80 m 0.84). Choice of k pending (user).
+  0.60, bloater 0.26); k = 6 splits deep at 60 m (40-60 m bloater 0.66; 60-80 m 0.84).
+  Huron uses k = 5 (user). Stratum stats and figures now per lake: stratum_stats.R LAKE_STRATA (both lakes k 5,
+  >= 5 fish, >= 5 tows), lake_strata(), named_strata() (Michigan descriptive names; Huron range names
+  "Fishing a-b m, bottom c-d m"); 09 and 10 take LAKE (outputs stratum_stats_huron.csv, stratum_se_huron_*.png,
+  strata_adams_style_huron_*.png, strata_tows_huron.png). Huron by number (tows/yr; mean / SD / SE now):
+  0-40 m over 0-40 m (110; 6/yr) smelt 0.79 / 0.29 / 0.12; 0-40 m over 40-120 m (199; 14/yr) smelt 0.60 / 0.33 /
+  0.09, bloater 0.26 / 0.32 / 0.08, other 0.12; 20-40 m over 80-120 m (16; 2/yr) smelt 0.81 / 0.25 / 0.18;
+  40-80 m over 40-120 m (83; 5.5/yr) bloater 0.74 / 0.30 / 0.13, smelt 0.20 / 0.24 / 0.10; 0-20 m over 120-140 m
+  (7 tows) mixed. tow_catch fix: a Huron tow with a missing "other" weight now drops out of weight proportions
+  (n NA), as for the other groups (Michigan unchanged).
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the

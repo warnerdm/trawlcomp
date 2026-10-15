@@ -54,6 +54,6 @@ tow_catch <- function(tows, measure = c("N", "WEIGHT")) {
            alewife_removed = if_else(contaminated, alewife, 0),
            alewife = if_else(contaminated, 0, alewife),
            other = if_else(lake == "Michigan", NA_real_, other),
-           n = alewife + smelt + bloater + coalesce(other, 0)) %>%
+           n = alewife + smelt + bloater + if_else(lake == "Michigan", 0, other)) %>%  # Huron: NA other weight -> NA n
     select(-contaminated)
 }
