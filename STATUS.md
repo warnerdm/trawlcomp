@@ -61,7 +61,9 @@
   four strata: (1) surface 0-20 m over 0-160 m bottom (+ 20-40 m over 80-120 m) alewife 0.72 (SD 0.37), smelt
   0.16, bloater 0.12; (2) 20-40 m over 20-80 m bottom, mixed 0.45 / 0.34 / 0.22 (SDs 0.35-0.41); (3) deep 40-80 m
   over 60-120 m, bloater 0.99 (0.04); (4) surface over 160-200 m bottom, alewife 0.89. k = 5 splits the surface
-  over 100-160 m bottom. Adams Table 4 (1994-95): 0.71/0.18/0.06; 0.40/0.20/0.38; offshore alewife 0.93; deep
+  over 100-160 m bottom. With >= 3 tows per cell instead (user, 2026-10-15; script now MIN_TOWS = 3; outputs
+  _min10fish_min3tows): 458 tows, 23 cells; single 3-tow cells peel off again (20-40 m over 120-140 and 140-160 m
+  bottom; surface over 220-240 m) and the mixed midwater-nearshore stratum appears only at k = 7. Adams Table 4 (1994-95): 0.71/0.18/0.06; 0.40/0.20/0.38; offshore alewife 0.93; deep
   bloater 0.90.
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)

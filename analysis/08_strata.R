@@ -4,7 +4,7 @@ library(patchwork)
 
 CELL_M <- 20
 MIN_FISH <- 10   # fish (by number) per tow; 0 = Adams et al. (all tows)
-MIN_TOWS <- 5    # tows per cell; 2 = Adams et al.
+MIN_TOWS <- 3    # tows per cell; 2 = Adams et al.
 OUT_TAG <- paste0(if (MIN_FISH > 0) paste0("_min", MIN_FISH, "fish") else "", if (MIN_TOWS != 2) paste0("_min", MIN_TOWS, "tows") else "")
 tows <- drop_bad_coordinates(select_tows()) %>% filter(lake == "Michigan")
 n_fish <- tow_catch(tows, "N") %>% select(OP_ID, n_fish = n)
