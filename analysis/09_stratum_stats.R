@@ -20,8 +20,8 @@ write_csv(cb, file.path(OUTPUT_DIR, "stratum_combined_michigan.csv"))
 options(width = 220)
 cat("Tows per stratum (>= 10 fish, cells with >= 5 tows):\n")
 print(ts %>% count(stratum_name, cells))
-print(as.data.frame(ss %>% select(measure, stratum_name, group, tows, years, tows_per_year, mean_p, ratio_p, sd_all,
-                                  sd_within, se_now, se_now_all) %>%
+print(as.data.frame(ss %>% select(measure, stratum_name, group, tows, tows_per_year, mean_p, sd_within, se_now,
+                                  ratio_p, sd_ratio_within, se_ratio_now) %>%
                       mutate(across(where(is.double), \(x) round(x, 3)))))
 cat("\nCombined over strata (W = share of cells):\n")
 print(as.data.frame(mutate(cb, across(where(is.double), \(x) round(x, 3)))))

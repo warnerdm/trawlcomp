@@ -76,6 +76,10 @@
   Within-year SD only slightly below all-years SD. Combined with W = share of cells: alewife 0.54 (SE 0.067),
   bloater 0.31 (0.049), smelt 0.15 (0.056). Ratio and mean-of-proportions differ in surface nearshore (alewife
   0.85 vs 0.72): big catches are alewife.
+  Ratio-estimator SE added (tows as units; pooled within-year residuals count - R n, / mean catch): by number at
+  current effort, surface nearshore alewife 0.13 (vs 0.09 for the mean of proportions), smelt 0.13 (0.07),
+  bloater 0.04 (0.06); midwater nearshore 0.18-0.22 (0.19-0.28); offshore and deep smaller than the mean's.
+  Approximation: ratio variance is biased with 1-2 tows per year and heavy-tailed catches.
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the

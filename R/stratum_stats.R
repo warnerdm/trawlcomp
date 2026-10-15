@@ -9,6 +9,12 @@
 #   sd_within  pooled within-year SD: deviations from each year's stratum mean, df = tows - years
 #              (years with one tow add no df); the "repeat the tow here" SD within a survey
 #   se_now     sd_within / sqrt(median tows per year): SE of a year's stratum mean at current effort
+#   Ratio (catch-weighted) estimator, tows as the sampling unit (Cochran 1977, ratio estimator): residuals
+#   e_i = count_i - R n_i; SE(R) for m tows = sd(e) / (nbar sqrt(m)), nbar = mean catch per tow. On one year's
+#   m tows this is sqrt(sum n_i^2 (p_i - R)^2 / (m (m - 1) nbar^2)).
+#   sd_ratio_within  pooled within-year sd(e) / nbar (R and its residuals per year; df = tows - years)
+#   sd_ratio_all     sd(e) / nbar over all tows with the all-years R
+#   se_ratio_now     sd_ratio_within / sqrt(median tows per year)
 # Combined (W_h = stratum share of cells, each cell an equal share of the sample space):
 #   p_st = sum W_h mean_p_h, se_st = sqrt(sum W_h^2 sd_within_h^2 / m_h) with m_h = median tows per year.
 source("D:/pyprojects/trawlcomp/R/strata.R")
@@ -52,11 +58,16 @@ stratum_stats <- function(props, groups = STRATA_GROUPS) {
               tows_per_year = median(table(YEAR)),
               mean_p = mean(p), ratio_p = sum(count) / sum(n), sd_all = sd(p),
               ss_within = sum((p - ave(p, YEAR))^2), df_within = tows - years,
+              nbar = mean(n),
+              ss_ratio_within = sum((count - n * ave(count, YEAR, FUN = sum) / ave(n, YEAR, FUN = sum))^2),
+              sd_ratio_all = sd(count - n * ratio_p) / nbar,
               cells = first(cells), .groups = "drop") %>%
     mutate(sd_within = sqrt(ss_within / df_within),
            se_now = sd_within / sqrt(tows_per_year),
-           se_now_all = sd_all / sqrt(tows_per_year)) %>%
-    select(-ss_within)
+           se_now_all = sd_all / sqrt(tows_per_year),
+           sd_ratio_within = sqrt(ss_ratio_within / df_within) / nbar,
+           se_ratio_now = sd_ratio_within / sqrt(tows_per_year)) %>%
+    select(-ss_within, -ss_ratio_within)
 }
 
 # Combined (stratified) proportion and SE per group, W_h = share of cells
