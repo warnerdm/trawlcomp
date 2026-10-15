@@ -34,15 +34,22 @@ read_catch <- function() {
 # rows get zeros. The catch is matched on OP_ID and lake, so each lake uses its own source.
 # Michigan has no "other" group (user, 2026-10-14): the L_2_Y files hold only a few species, so other = NA
 # and n = alewife + smelt + bloater there. alewife_removed: alewife set to 0 as contamination.
-tow_catch <- function(tows) {
+# measure = "N" (numbers) or "WEIGHT" (catch weight; a WEIGHT that is missing, or 0 with fish counted, makes
+# that group's total NA, so the tow's n is NA and it drops out of weight-based proportions).
+tow_catch <- function(tows, measure = c("N", "WEIGHT")) {
+  measure <- match.arg(measure)
   counts <- read_catch() %>%
     semi_join(tows, by = c("OP_ID", "lake")) %>%
-    mutate(group = coalesce(SPECIES_GROUPS[as.character(SPECIES)], "other")) %>%
-    summarise(.by = c(OP_ID, group), N = sum(N)) %>%
+    mutate(group = coalesce(SPECIES_GROUPS[as.character(SPECIES)], "other"),
+           WEIGHT = if_else(WEIGHT == 0 & N > 0, NA_real_, WEIGHT),
+           value = .data[[measure]]) %>%
+    summarise(.by = c(OP_ID, group), N = sum(value)) %>%
     pivot_wider(names_from = group, values_from = N, values_fill = 0)
+  for (g in setdiff(c("alewife", "smelt", "bloater", "other"), names(counts))) counts[[g]] <- 0
   tows %>%
     left_join(counts, by = "OP_ID") %>%
-    mutate(across(c(alewife, smelt, bloater, other), \(x) coalesce(x, 0)),
+    # no catch rows -> 0; NA from a missing weight is kept
+    mutate(across(c(alewife, smelt, bloater, other), \(x) if_else(OP_ID %in% counts$OP_ID, x, 0)),
            contaminated = coalesce(fishing_depth > ALEWIFE_CONTAMINATION_DEPTH_M, FALSE),
            alewife_removed = if_else(contaminated, alewife, 0),
            alewife = if_else(contaminated, 0, alewife),

@@ -18,6 +18,8 @@ time, what would be the mean proportion of a group and its SD? Selectivity is ou
   are set to 0, both lakes (user, 2026-10-14; tow_catch.ALEWIFE_CONTAMINATION_DEPTH_M).
 - Paths are set once in `R/paths.R`. Never hard-code them elsewhere.
 
+- Groups can be by number (default) or weight: tow_catch(measure = "WEIGHT").
+
 ## Environment
 - R 4.4.0: `C:\Program Files\R\R-4.4.0\bin\Rscript.exe` (4.6.1 lacks packages).
 - Code lives in `R/` (functions); `analysis/` holds scripts/Rmd that only call them; results go to `output/`.
