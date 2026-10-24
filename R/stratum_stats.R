@@ -199,10 +199,11 @@ plot_tows_strata <- function(pts, cells, cell_m = 20, title = NULL) {
 
 # Survey region from the transect name: its leading letters (Michigan nn, no, wn, so, sn as EchoNet2Fish).
 # The later northern splits (nne, nnw from 2016; nnlu, 2 tows in 2011) are merged into nn so the regions are
-# the same in all years (2026-10-24).
+# the same in all years (2026-10-24). Huron sg (Saginaw Bay mouth, 2 tows on one night in 2018) is pooled into mw
+# (main basin west) (user, 2026-10-24).
 tow_region <- function(transect) {
   r <- str_extract(tolower(transect), "^[a-z]+")
-  if_else(r %in% c("nne", "nnw", "nnlu"), "nn", r)
+  case_when(r %in% c("nne", "nnw", "nnlu") ~ "nn", r == "sg" ~ "mw", TRUE ~ r)
 }
 
 # Region effect on tow proportions within each stratum x group: one-way ANOVA p; region share of variance

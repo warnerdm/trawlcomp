@@ -81,7 +81,7 @@ Dependencies: 04, 05 and 06 read 03's output; 10 reads 09's output. `run_all.R` 
 | Same minimums for the exploratory clustering (2-7 strata) | 5, 5 | `analysis/08_strata.R` `MIN_FISH`, `MIN_TOWS` (or env vars) |
 | Cell size | 20 m | `CELL_M` in 08; `cell_m` arguments elsewhere |
 | Species groups | alewife, smelt, bloater (+ other in Huron) | `R/tow_catch.R` `SPECIES_GROUPS`, `R/stratum_stats.R` `LAKE_STRATA` |
-| Michigan region pooling | nne, nnw, nnlu -> nn | `R/stratum_stats.R` `tow_region()` |
+| Region pooling | Michigan nne, nnw, nnlu -> nn; Huron sg -> mw | `R/stratum_stats.R` `tow_region()` |
 | Depth classes within regions (step 15) | fishing 0-20/20-40/40-60/60+ m; bottom 0-40/40-80/80-120/120+ m; >= 5 fish | `R/region_depth.R` `FD_BREAKS`, `BD_BREAKS`, `REGION_MIN_FISH` |
 
 ## 6. Reading the results

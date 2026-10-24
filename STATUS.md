@@ -61,7 +61,7 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   north-south split (smelt nn 0.59 vs sn 0.01; region 37-58% of variance); small or none elsewhere. Huron:
   region 20-32% of variance in several strata, including deep bloater/smelt/other.
 - Huron region x depth strata (2026-10-24; analysis 14; regions gb Georgian Bay, me main east, mw main west,
-  nc North Channel, sb southern basin, sg Saginaw Bay 2 tows): smelt dominates gb and nc (0.80-0.96 in the
+  nc North Channel, sb southern basin; sg, 2 tows, pooled into mw): smelt dominates gb and nc (0.80-0.96 in the
   shallow strata), bloater is highest in me and sb (shallow over 40-120 m: 0.45-0.49 vs nc 0.00, gb 0.10); deep
   bloater 0.78-0.84 in me/mw/sb vs 0.57 gb (nc 3 tows, mostly smelt). Splitting a depth stratum by region at the
   same total tows cuts the variance of bloater and smelt by 15-27% (variance ratio 0.73-0.84; SE -8 to -15%);
@@ -74,7 +74,8 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   SE), and the share of tow-to-tow variance explained (R^2 of linear models on tow proportions).
 - Michigan (555 tows): depth explains alewife 31%, bloater 50%, smelt 6%; region alewife 1%, bloater 8%, smelt
   15%; region x depth 27-58%; unexplained 42-73%. Huron (440): depth smelt 33%, bloater 41%; region 23-26%;
-  region x depth 52-62%; alewife and other mostly unexplained (78-81%).
+  region x depth 50-62%; alewife and other mostly unexplained (78-86%). Huron sg (2 tows, Saginaw Bay mouth,
+  15 Sep 2018) pooled into mw (user, 2026-10-24); 5 Huron regions.
 
 ### 3. Acoustic (analysis 12; EchoNet2Fish intlaymeans_nph, 2004-2024)
 - Interval x 10 m layer fish_ha placed in the Michigan strata cells; NA/Inf = 0 (user; as EchoNet2Fish's own
