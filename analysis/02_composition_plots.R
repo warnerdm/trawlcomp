@@ -1,4 +1,4 @@
-# STATUS: proportions of each species group against fishing depth, bottom depth, lat and lon, by lake.
+# Proportion of each species group per tow against fishing depth, bottom depth, lat and lon, by lake.
 suppressWarnings(suppressMessages(source("D:/pyprojects/trawlcomp/R/composition_plots.R")))
 
 catch <- tow_catch(drop_bad_coordinates(select_tows()))

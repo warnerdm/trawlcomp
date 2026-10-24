@@ -1,4 +1,5 @@
-# EchoNet2Fish fish_ha (fish per ha, interval x 10 m layer) by trawl stratum. First pass: one year.
+# EchoNet2Fish fish_ha (interval x 10 m layer) by trawl stratum for ONE year (YEAR env var), with a cell map. Optional;
+# not in run_all.R (12 covers all years).
 suppressWarnings(suppressMessages(source("D:/pyprojects/trawlcomp/R/acoustic.R")))
 YEAR <- as.integer(Sys.getenv("YEAR", 2004))
 

@@ -1,4 +1,4 @@
-# STATUS task 1: where the acoustic-survey tows sit relative to each other.
+# Where the acoustic-survey tows sit relative to each other (tows per lake-year-transect, depth neighbours, night check).
 suppressWarnings(suppressMessages(source("D:/pyprojects/trawlcomp/R/tow_layout.R")))
 t <- select_tows(); print(count(t, lake))
 cat("missing: transect", sum(is.na(t$transect) | t$transect == ""), " fishing_depth", sum(is.na(t$fishing_depth)),

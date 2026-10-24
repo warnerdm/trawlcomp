@@ -1,145 +1,87 @@
 # trawlcomp status
 
-## Current state (2026-10-14)
-- Tow selection: `R/select_tows.R` `select_tows()` (user, 2026-10-14).
-  - Michigan: every tow in the bloaterTS files `L_2_Y_<year>_Acoustic_optrop.csv`, and only those; the USGS
-    release (OP.csv and associated files) is never used for Michigan. 701 tows, 2004-2024 (no 2020).
-  - Huron: USGS release, OP_TARGET TARGET 209/210, 2004+, SAMPLE_TYPE 1, vessels 17/35/88: 493 tows
-    (2004-2018, none in 2006).
-  - No trawl-design filter.
-  - Bad coordinates dropped for now (user): `drop_bad_coordinates()` (missing, or outside the lake box).
-    11 Huron tows: 57431 (2004, 42.05/-83.24, transect nc1), 76630, 78281, 83500 (missing), 89398-89404
-    (Baird 2014, ~0.75/+1.39, not decimal degrees). Leaves Michigan 701, Huron 482.
-  - All tows are night tows of the lakewide acoustic surveys (user). Logged TIME 06:00-20:00 in 24 tows:
-    17 Huron 2004-2005/2012 at 18:35-20:00 (dusk); Michigan 57437 (10:57), 83437 (07:24), 93081 (06:09),
-    83434 (06:02), 81848-81850 (19:00-19:54). Not acted on.
-- Task 1 done (`R/tow_layout.R`, `analysis/01_tow_layout.R`, output/transect_summary.csv): 1-4 tows per
-  lake-year-transect (mostly 1-2), usually at different fishing depths. Tows with >= 1 other tow on the same
-  lake-year-transect: any depth MI 495/701, HU 372/493; within 10 m MI 234, HU 123; within 5 m MI 135, HU 63.
+Last updated 2026-10-24. Reproduce everything with `run_all.R` (about 10 minutes); the step-by-step guide is
+`docs/REPRODUCE.md`. Numbers below are from that run unless marked as history.
 
-- Groups (user): alewife (106), smelt (109), bloater (204), plus other in Huron only; N summed over life
-  stages. Michigan has no other group (user): the L_2_Y catch files hold only a few species (the release has
-  ~3% other for these tows), so Michigan proportions are of the three species. `R/tow_catch.R` `tow_catch()`.
-  Totals (1,183 tows): MI 78,396 fish, 41 tows with none of the three; HU 110,421 (other 5,394), 11 zero-catch.
-  Smooth covariate terms, no bins (user).
+## Question
+If a midwater tow were repeated at the same place and time, what would be the mean proportion of each species
+group and its SD, and how does the uncertainty of a mean proportion fall with the number of tows? General
+question about acoustic-trawl surveys (e.g. saildrones do the acoustics, a ship only trawls: is more trawling
+worth it?), not apportioning (user). Selectivity is out of scope.
 
-## Composition variability (Michigan and Huron, 2026-10-14/15)
-- Bottom depths: 2008 Michigan vessel 17 in feet (x 0.3048); 77542, 104167 NA (implausible), as bloaterTS
-  (select_tows). Alewife in tows with fishing depth > 40 m are contamination and set to 0 (user; tow_catch
-  ALEWIFE_CONTAMINATION_DEPTH_M): 992 fish in 42 Michigan tows (+1 Huron); 7 Michigan tows held only alewife and
-  drop out (58086, 58104, 79137, 83153, 85929, 87181, 89419). 58104 (2005 v88, 60.4 m, 279 alewife only) is odd:
-  check its fishing depth. tow_catch(measure = "N" | "WEIGHT"); weight missing for 38 Michigan tows.
-- Bottom depth 0 = not recorded (all 11 2019 vessel 17 tows have END_DEPTH 0; found by comparing with pydt4's
-  acoustic bottom for 77 Michigan tows: median difference 0.3 m, IQR -1 to +2 m; 112424/112426 had been halved).
-  select_tows treats 0 as NA. All analyses rerun 2026-10-15; strata: surface nearshore 339, midwater 49,
-  offshore 18, deep 41 tows; numbers changed by <= 0.02. No further bottom checking (user).
-- Composition plots (`R/composition_plots.R`, `analysis/02_composition_plots.R`): fishing depth is the main
-  gradient (MI alewife -> bloater ~25-45 m; HU smelt -> bloater ~30-40 m); spatial patterns too.
-- Models (`R/fit_models.R`, `analysis/03_fit_models.R`; output/model_summary.csv, repeat_tow_stats.csv): one
-  binomial bam per lake and group: s(fishing_depth) + s(bottom_depth) + s(lon, lat) + year RE + tow RE with a
-  separate SD per layer (< 35 m / >= 35 m; user). 651 Michigan, 469 Huron tows. Tow SD (logit) shallow / deep:
-  MI alewife 3.20 / 2.24, smelt 2.89 / 2.11, bloater 2.89 / 2.64; HU smelt 2.12 / 1.74, bloater 2.22 / 1.72,
-  other 2.06 / 1.86. Repeat-tow SD of a proportion ~0.2-0.35, 3-6x the binomial SD; 90% intervals cover
-  0.90-0.99 (in-sample). Effective n per tow ~ n / k^2; ceiling ~1/rho (~2-3 fish).
-- SE vs number of tows (`R/se_plots.R`, `analysis/04_se_vs_tows.R`): SE_i(m) = sd_obs_i / sqrt(m). Fish per tow
-  left out (user: tows are what matter).
-- Effort (`R/effort.R`, `analysis/05_effort.R`): tows with catch per year, median (range): MI < 35 m 26.5
-  (17-47), >= 35 m 5 (1-10); HU 21 (12-44), 9.5 (3-14). SE at current effort, deep: MI bloater 0.087, smelt
-  0.067; HU bloater 0.074, smelt 0.066. Deep layer is on the steep part of the curve. Context: user's question
-  is general (saildrones collect acoustics, the ship only trawls: is more trawling worth it?), not apportioning.
-- Subsampling check (`R/subsample.R`, `analysis/06_subsample.R`): real / model single-tow SD as RMS over years
-  1.05-1.47 for all main groups and layers (model modestly optimistic; real layer SEs ~5-45% larger). Deep MI
-  years are either all bloater (SD 0) or mixed (SD 0.4-0.55); a median over years misleads (earlier error).
-- Adams et al. (2006, NAJFM 26:612-621) depth stratification, Michigan (`R/strata.R`, `analysis/08_strata.R`;
-  output/strata_michigan_{n,weight}.png, strata_tree_michigan_*.png, strata_michigan_summary.csv): 20 m cells of
-  bottom x fishing depth, >= 2 tows, mean + SD of proportions, neighbour-restricted complete linkage
-  (adespatial::constr.hclust; main connected block). Number and weight nearly identical. k = 2: split at fishing
-  depth 40 m: shallow (554 tows) alewife 0.66 (SD 0.41), smelt 0.20 (0.34), bloater 0.14 (0.30); deep (40-80 m
-  over 40-140 m bottom, 91 tows) bloater 0.87 (0.31). k = 3-4 split the deep block (mixed smelt/bloater at
-  40-60 m vs bloater core at 60-80 m, 0.95); k = 5-7 split the offshore surface (bottom > 180 m). W_d = share of
-  cells (no acoustic biomass); Neyman ~78-80% of tows shallow.
-  Restrictions (user, 2026-10-15; analysis/08_strata.R MIN_FISH, MIN_TOWS; outputs tagged _min10fish[_min5tows]):
-  Adams used all tows with complete catch data and cells with >= 2 tows (no catch minimum found; user to reread).
-  >= 10 fish per tow (by number) keeps 469 of 651 tows (deep 91 -> 45; the mixed deep 40-60 m cells were tiny
-  catches, all-smelt or all-bloater). Adding >= 5 tows per cell: 445 tows in 19 cells. k = 4 resembles Adams'
-  four strata: (1) surface 0-20 m over 0-160 m bottom (+ 20-40 m over 80-120 m) alewife 0.72 (SD 0.37), smelt
-  0.16, bloater 0.12; (2) 20-40 m over 20-80 m bottom, mixed 0.45 / 0.34 / 0.22 (SDs 0.35-0.41); (3) deep 40-80 m
-  over 60-120 m, bloater 0.99 (0.04); (4) surface over 160-200 m bottom, alewife 0.89. k = 5 splits the surface
-  over 100-160 m bottom. With >= 3 tows per cell instead (user, 2026-10-15; script now MIN_TOWS = 3; outputs
-  _min10fish_min3tows): 458 tows, 23 cells; single 3-tow cells peel off again (20-40 m over 120-140 and 140-160 m
-  bottom; surface over 220-240 m) and the mixed midwater-nearshore stratum appears only at k = 7.
-  >= 5 fish, >= 5 tows (08_strata.R now takes MIN_FISH / MIN_TOWS env vars, defaults 10 / 5; outputs
-  _min5fish_min5tows): 555 tows, 524 in 19 cells. Deep 55 tows (bloater 0.98, SD 0.08). k = 4 splits the surface
-  over 100-160 m bottom (87 tows; bloater 0.25, SD 0.38) before the midwater nearshore stratum (k = 5: 54 tows,
-  0.47 / 0.31 / 0.22). Stratum statistics (09) still use the 10-fish, 5-tow 4 strata.
-  >= 1 fish, >= 5 tows (_min1fish_min5tows): 651 tows, 635 in 24 cells; k = 2 the same 40 m split, but k = 3-6
-  peel off single deep cells (40-60 m fishing over 40-60 and 80-100 m bottom, 6 and 8 tows, smelt-or-bloater
-  tiny catches, SD 0.46-0.49); no nearshore structure by k = 6. The 5-fish minimum is what lets the strata show. Adams Table 4 (1994-95): 0.71/0.18/0.06; 0.40/0.20/0.38; offshore alewife 0.93; deep
-  bloater 0.90.
-- Stratum framework (user, 2026-10-15: not for survey design; a framework for mean, SD and SE of proportions
-  across tows). `R/stratum_stats.R`, `analysis/09_stratum_stats.R`; output/stratum_stats_michigan.csv,
-  stratum_combined_michigan.csv, stratum_se_michigan_{n,weight}.png. The 4 strata (>= 10 fish, >= 5 tows per
-  cell, defined by number, used for both measures): surface nearshore 340 tows (15/yr), midwater nearshore 49
-  (2/yr), surface offshore 17 (1/yr), deep 39 (2/yr). Mean of tow proportions, catch-weighted ratio, SD over all
-  tows, pooled within-year SD, SE at current effort. By number, within-year SD / SE now: surface nearshore
-  alewife 0.35 / 0.09, smelt 0.29 / 0.07, bloater 0.25 / 0.06; midwater nearshore 0.39 / 0.28, 0.36 / 0.26,
-  0.27 / 0.19; surface offshore alewife 0.17 (df 5, unstable); deep bloater 0.04 / 0.03 (weight: 1.00, SD 0).
-  Within-year SD only slightly below all-years SD. Combined with W = share of cells: alewife 0.54 (SE 0.067),
-  bloater 0.31 (0.049), smelt 0.15 (0.056). Ratio and mean-of-proportions differ in surface nearshore (alewife
-  0.85 vs 0.72): big catches are alewife.
-  Ratio-estimator SE added (tows as units; pooled within-year residuals count - R n, / mean catch): by number at
-  current effort, surface nearshore alewife 0.13 (vs 0.09 for the mean of proportions), smelt 0.13 (0.07),
-  bloater 0.04 (0.06); midwater nearshore 0.18-0.22 (0.19-0.28); offshore and deep smaller than the mean's.
-  Approximation: ratio variance is biased with 1-2 tows per year and heavy-tailed catches.
-  Year effects (one-way ANOVA within stratum, by number): significant in surface nearshore (year 10-20% of
-  variance; bloater +0.09 / decade, smelt -0.08) and midwater nearshore bloater (44%; +0.26 / decade, smelt
-  -0.28); none in deep. Pooling years is fine for SDs (5-10% larger), not for nearshore means.
-- Stratum statistics switched to 5 strata from tows with >= 5 fish, cells >= 5 tows (user, 2026-10-15;
-  stratum_stats.R MI_STRATA_K / MI_STRATA_MIN_FISH / MI_STRATA_MIN_TOWS; analyses 09 and 10 rerun). Strata and
-  tows (per year): surface nearshore 308 (15), midwater nearshore 54 (2), surface mid-lake 87 (5; surface over
-  100-160 m bottom), surface offshore 20 (1), deep 55 (3). By number, mean / within-year SD / SE now:
-  nearshore alewife 0.74 / 0.34 / 0.09, smelt 0.17 / 0.29 / 0.08, bloater 0.09 / 0.23 / 0.06; midwater
-  alewife 0.47 / 0.38 / 0.27, smelt 0.31 / 0.35 / 0.25, bloater 0.22 / 0.26 / 0.18; mid-lake alewife 0.61 /
-  0.33 / 0.15, bloater 0.25 / 0.29 / 0.13, smelt 0.14 / 0.24 / 0.11; offshore alewife 0.85 / 0.26 / 0.26;
-  deep bloater 0.98 / 0.08 / 0.05. Earlier 4-strata numbers above are superseded.
-- Adams Figure 4 style plot (`plot_strata_adams()` in R/stratum_stats.R, `analysis/10_strata_figure.R`;
-  output/strata_adams_style_michigan_{n,weight}.png): strata outlines in bottom depth x fishing depth,
-  crosshatch spacing ~ 1 / (mean SD over species)^2 (none below ~0.16), lakebed shaded.
-- EchoNet2Fish acoustic output (user, 2026-10-15): D:/Acoustics/EchoNet2Fish_LM/MI<year>/ ... intlaymeans_nph ...csv,
-  interval x 10 m layer (layer depth = depth below surface, user) with Sv_mean, PRC_ABC, sigma, nv, fish_ha and
-  species/size densities; 2004-2024 (no 2020). `R/acoustic.R` (read_intlay, assign_strata to the 20 m cells),
-  `analysis/11_acoustic_fish_ha.R` (YEAR env var; output/acoustic_fish_ha_{strata,cells,box}_<year>).
-  fish_ha NA/Inf set to 0 (user). 2004: 2,029 rows, 1,211 Inf (all have Sv: backscatter but sigma 0), 349 NA.
-  EchoNet2Fish's own species columns are 0 in those rows and interval/region totals equal the layer sums, so
-  zeroing matches its estimates. Consequence: the deep stratum has fish_ha 0 in every row in 2004 and 2010 (no
-  sigma at depth); 2015 68/157 rows with sigma, 2022 163/215. 2004 mean fish/ha: surface nearshore 397 (CV 2.4),
-  midwater 32, mid-lake 784, offshore 1,150, deep 0. Zero density is normal in Lake Michigan (user); NA/Inf = 0
-  stands as EchoNet2Fish does.
-  All years (`analysis/12_acoustic_fish_ha_years.R`; output/acoustic_fish_ha_strata_{by_year,pooled}.csv,
-  acoustic_fish_ha_strata_by_year.png): 20 years. Pooled mean fish/ha (share of zero rows): surface nearshore 377
-  (44%), midwater nearshore 68 (62%), surface mid-lake 355 (60%), surface offshore 433 (63%), deep 18.5 (68%),
-  outside strata 13 (87%). Deep is 0-1 fish/ha in 2004-2011, 6-115 from 2012.
-- Huron Adams strata (user, 2026-10-15; 08_strata.R LAKE env var; Huron groups alewife, smelt, bloater, other;
-  >= 5 fish, >= 5 tows; outputs strata_huron_*_min5fish_min5tows): 440 tows, 415 in 17 cells. k = 2: split at
-  fishing depth 40 m: shallow (332 tows) smelt 0.67, bloater 0.21, other 0.11; deep (40-80 m over 40-120 m bottom,
-  83 tows) bloater 0.74 (SD 0.31), smelt 0.20. k = 3 peels off one 7-tow cell (surface over 120-140 m); k = 4 20-40 m
-  over 80-120 m (smelt 0.80); k = 5 splits shallow by bottom depth: 0-40 m bottom (smelt 0.79) vs 40-120 m (smelt
-  0.60, bloater 0.26); k = 6 splits deep at 60 m (40-60 m bloater 0.66; 60-80 m 0.84).
-  Huron uses k = 5 (user). Stratum stats and figures now per lake: stratum_stats.R LAKE_STRATA (both lakes k 5,
-  >= 5 fish, >= 5 tows), lake_strata(), named_strata() (Michigan descriptive names; Huron range names
-  "Fishing a-b m, bottom c-d m"); 09 and 10 take LAKE (outputs stratum_stats_huron.csv, stratum_se_huron_*.png,
-  strata_adams_style_huron_*.png, strata_tows_huron.png). Huron by number (tows/yr; mean / SD / SE now):
-  0-40 m over 0-40 m (110; 6/yr) smelt 0.79 / 0.29 / 0.12; 0-40 m over 40-120 m (199; 14/yr) smelt 0.60 / 0.33 /
-  0.09, bloater 0.26 / 0.32 / 0.08, other 0.12; 20-40 m over 80-120 m (16; 2/yr) smelt 0.81 / 0.25 / 0.18;
-  40-80 m over 40-120 m (83; 5.5/yr) bloater 0.74 / 0.30 / 0.13, smelt 0.20 / 0.24 / 0.10; 0-20 m over 120-140 m
-  (7 tows) mixed. tow_catch fix: a Huron tow with a missing "other" weight now drops out of weight proportions
-  (n NA), as for the other groups (Michigan unchanged).
-- Region within strata (2026-10-24; `tow_region()`, `region_effects()` in R/stratum_stats.R, `analysis/13_region_test.R`,
-  output/region_effects_<lake>.csv). Michigan regions from transect names, nne/nnw/nnlu merged into nn (5 regions
-  as EchoNet2Fish). By number: midwater nearshore has a strong north-south split (smelt nn 0.59 vs sn 0.01;
-  bloater nn 0.02 vs sn 0.41; region 37-58% of variance; smelt SD 0.40 -> 0.30 within regions); surface
-  nearshore significant but small (3-14%; smelt nn 0.29 vs sn/so 0.05); surface mid-lake bloater/smelt modest
-  (13-15%); surface offshore and deep none. Region effects mostly survive adjusting for year.
+## Data and data rules (all applied in code; R/select_tows.R, R/tow_catch.R)
+- Michigan: tows, catch and lengths ONLY from bloaterTS `L_2_Y_<year>_Acoustic_*` files, 2004-2024 (no 2020);
+  701 tows. Huron: USGS release (OP, OP_TARGET TARGET 209/210, TR_OP, TR_CATCH), 2004+, SAMPLE_TYPE 1, vessels
+  17/35/88; 493 tows (2004-2018, none in 2006). All tows are night tows of the lakewide acoustic surveys.
+- Bad coordinates dropped: 11 Huron tows (89398-89404 not decimal degrees; 76630, 78281, 83500 missing; 57431
+  off the lake). Leaves Michigan 701, Huron 482.
+- Bottom depth = mean of BEG_DEPTH and END_DEPTH; a depth of 0 = not recorded (all 11 2019 vessel 17 END_DEPTH);
+  2008 Michigan vessel 17 bottom depths are in feet (x 0.3048); 77542 and 104167 bottom depth NA (as bloaterTS).
+- Groups: alewife (106), smelt (109), bloater (204); Huron also "other" (all other species). Michigan has no
+  other group (its catch files hold only a few species). N (or WEIGHT) summed over life stages; species absent
+  from a tow count as 0.
+- Alewife in tows with fishing depth > 40 m are contamination and set to 0 (both lakes): 992 Michigan fish in
+  42 tows; 7 Michigan tows then have no fish (58104, 279 alewife at 60.4 m, is odd; not acted on).
+- Weight: a tow with a missing (or 0 with fish counted) weight for any group it caught drops out of weight
+  proportions (38 Michigan tows; a few Huron tows with missing "other" weight).
+- Tows with fish in the groups: Michigan 651, Huron 469.
+
+## Results (current)
+### 1. Tow-level model (analyses 02-06; all tows with >= 1 fish)
+- Binomial GAM per lake and group: s(fishing_depth) + s(bottom_depth) + s(lon, lat) + year RE + tow RE with a
+  separate SD per layer (fishing depth < 35 m / >= 35 m). Tow SD (logit) shallow / deep: MI alewife 3.20 / 2.24,
+  smelt 2.87 / 2.11, bloater 2.89 / 2.64; HU smelt 2.12 / 1.74, bloater 2.22 / 1.72, other 2.06 / 1.86. Year SD
+  0.5-2.1.
+- A single tow's proportion has SD ~0.2-0.35, 3-6x the binomial SD; effective n per tow ~ n / 16-35, with a
+  ceiling of ~1/rho (~2-3 fish). Precision comes from the number of tows, not fish per tow.
+- Subsampling check: real within-year SD / model SD (RMS over years) 1.05-1.47: the model is modestly optimistic.
+- Fishing depth is the main gradient in both lakes; location matters too (s(lon, lat) significant everywhere).
+
+### 2. Stratum framework (analyses 08-10, 13; tows with >= 5 fish)
+- Strata from Adams et al. (2006, NAJFM 26:612-621) depth stratification: 20 m cells of bottom depth x fishing
+  depth, cells with >= 5 tows, mean + SD of per-tow proportions, neighbour-restricted complete linkage
+  (adespatial::constr.hclust), 5 strata per lake (stratum_stats.R LAKE_STRATA). Proportions by number and weight
+  give nearly the same strata; the strata are defined by number and used for both.
+- Michigan (524 tows): surface nearshore 308 (15/yr), midwater nearshore 54 (2/yr), surface mid-lake 87 (5/yr),
+  surface offshore 20 (1/yr), deep 55 (3/yr). By number, mean / SE at current effort (all-years SD):
+  nearshore alewife 0.74 / 0.09; midwater alewife 0.47, smelt 0.31, bloater 0.22, SEs 0.25-0.29; deep bloater
+  0.98 / 0.05.
+- Huron (415 tows), strata named by range: fishing 0-40 m over 0-40 m bottom (110; smelt 0.79), 0-40 m over
+  40-120 m (199; smelt 0.60, bloater 0.26, other 0.12), 20-40 m over 80-120 m (16; smelt 0.81), 40-80 m over
+  40-120 m (83; bloater 0.74, SD 0.30), 0-20 m over 120-140 m (7; mixed).
+- One Michigan deep tow estimates the bloater share as precisely as ~20 Michigan surface-nearshore tows estimate
+  the alewife share (~40 on a CV basis); ~14 Huron deep tows.
+- Small groups have small absolute SEs but large CVs (e.g. Huron other: SE 0.06, CV ~48%).
+- Mean of tow proportions (every tow equal; used for all SDs) vs catch-weighted ratio estimator (also reported,
+  with its tow-based SE): they differ where composition depends on catch size (MI surface nearshore alewife
+  0.72 vs 0.85).
+- Year: significant within the nearshore strata (10-44% of variance; smelt -> bloater trend), none in deep.
+  Pooling years is fine for SDs (5-10% larger), not for nearshore means.
+- Region (transect prefix; Michigan nne/nnw/nnlu pooled into nn): Michigan midwater nearshore has a strong
+  north-south split (smelt nn 0.59 vs sn 0.01; region 37-58% of variance); small or none elsewhere. Huron:
+  region 20-32% of variance in several strata, including deep bloater/smelt/other.
+
+### 3. Acoustic (analysis 12; EchoNet2Fish intlaymeans_nph, 2004-2024)
+- Interval x 10 m layer fish_ha placed in the Michigan strata cells; NA/Inf = 0 (user; as EchoNet2Fish's own
+  species columns). Zero density is normal in Lake Michigan (user). Pooled mean fish/ha: surface nearshore 377,
+  midwater 68, mid-lake 355, offshore 433, deep 18.5. All water below 40 m is ~0-1 fish/ha in 2004-2010 in these
+  files (inside and outside the deep stratum). Paused (user).
+
+## Open / possible next steps
+- 58104 fishing depth (279 alewife only at 60.4 m).
+- Size groups (species x length cut) in the stratum framework (theory supports it; needs length data and cuts).
+- Huron region effects are large: region x depth strata for Huron if wanted.
+
+## History (superseded; kept for the record)
+- 2026-10-14: single 35 m layer split for effort/SE curves (analysis 05 still uses it); model tow SD first
+  lake-wide, then by layer; a median-over-years subsampling summary wrongly suggested the model overstated deep
+  Michigan variability (corrected to RMS).
+- 2026-10-15: Adams strata tried with no catch minimum, >= 10 fish, >= 10 fish with 3- or 5-tow cells, >= 1 fish
+  with 5-tow cells; small catches and 2-3 tow cells made the clustering peel off single noisy cells. Settled on
+  >= 5 fish, >= 5 tows (Michigan first 4 strata from >= 10 fish, then 5 strata from >= 5 fish). Outputs of the
+  superseded runs deleted 2026-10-24.
+- 2026-10-15: 2019 vessel 17 zero END_DEPTH found by comparing with pydt4's acoustic bottom (77 tows; median
+  difference 0.3 m); no further bottom checking (user).
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
@@ -159,6 +101,3 @@
   2006), 1-7 per year, vessel 88 38, vessel 35 3. 9 have J_w <= 0.3 (bloater or cisco by weight). Only 1 is in
   the bloaterTS Huron tow list, so 40 need tow matching from scratch.
 
-## Tasks (composition variability)
-- Done: tasks 1-4 (grouping by smooth covariates; groups alewife/smelt/bloater(/other); models; SE curves).
-- Open: 58104 fishing depth; Adams strata with a stricter cell minimum; layer-specific results for Huron strata.

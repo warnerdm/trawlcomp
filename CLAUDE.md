@@ -4,7 +4,9 @@ Variability of species and species-size-group proportions in midwater trawl catc
 Lake Huron acoustic-survey tows). The question: if a midwater tow were repeated at the same place and
 time, what would be the mean proportion of a group and its SD? Selectivity is out of scope for now.
 
-**Read `STATUS.md` first.** It holds current status, decisions and the task list.
+**Read `STATUS.md` first.** It holds current results, data rules, decisions and open items.
+`docs/REPRODUCE.md` is the step-by-step guide (steps, outputs, settings); `run_all.R` reruns everything
+(~10 min). Keep both in step with the code when anything changes.
 
 ## Data (read only; never copy, edit, move or delete)
 - Trawl data: `D:\pyprojects\bloaterTS\data\raw\trawl\` (master copy, owned by bloaterTS).
@@ -16,15 +18,19 @@ time, what would be the mean proportion of a group and its SD? Selectivity is ou
 - Groups: alewife, smelt, bloater (N summed over life stages); Huron also has other. Michigan has no other group.
 - Alewife in tows with fishing depth > 40 m are contamination (net passing through the upper water column) and
   are set to 0, both lakes (user, 2026-10-14; tow_catch.ALEWIFE_CONTAMINATION_DEPTH_M).
-- Paths are set once in `R/paths.R`. Never hard-code them elsewhere.
-
+- Bottom depth: 0 = not recorded; Michigan 2008 vessel 17 in feet; 77542, 104167 NA. Bad Huron coordinates
+  dropped (drop_bad_coordinates). Weight proportions drop tows with a missing weight for a group they caught.
 - Groups can be by number (default) or weight: tow_catch(measure = "WEIGHT").
+- Paths are set once in `R/paths.R` (EchoNet2Fish: `R/acoustic.R` EN2F_DIR, read only).
 
 ## Environment
 - R 4.4.0: `C:\Program Files\R\R-4.4.0\bin\Rscript.exe` (4.6.1 lacks packages).
-- Code lives in `R/` (functions); `analysis/` holds scripts/Rmd that only call them; results go to `output/`.
+- Code lives in `R/` (functions); `analysis/` holds numbered scripts that only call them; results go to
+  `output/` (git-ignored; logs in output/logs). Add a new script to run_all.R and docs/REPRODUCE.md.
+- Settled framework settings (user, 2026-10-15): Adams-style strata, 20 m cells, >= 5 fish per tow, >= 5 tows
+  per cell, 5 strata per lake (stratum_stats.R LAKE_STRATA). Zero acoustic densities are normal (user).
 
-## Method so far (from the 2026-10-14 discussion)
+## Method background (2026-10-14)
 - The tow is the sampling unit, not the fish: fish in one tow are a cluster. The binomial SD
   sqrt(p(1-p)/n) is a LOWER bound.
 - Model: beta-binomial (one group) / Dirichlet-multinomial (several groups). Var(p_hat) =

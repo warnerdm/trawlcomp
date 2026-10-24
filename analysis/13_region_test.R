@@ -1,4 +1,4 @@
-# Does composition differ by survey region within the depth strata? (LAKE env var; Michigan first)
+# Does composition differ by survey region within the depth strata? (LAKE env var, default Michigan)
 suppressWarnings(suppressMessages(source("D:/pyprojects/trawlcomp/R/stratum_stats.R")))
 LAKE <- Sys.getenv("LAKE", "Michigan")
 lk <- tolower(LAKE)

@@ -1,4 +1,4 @@
-# STATUS task 4: binomial GAMs with a tow random effect, per lake and group; repeat-tow mean and SD per tow.
+# Binomial GAMs with year and tow random effects (tow SD by depth layer), per lake and group; repeat-tow mean and SD per tow.
 suppressWarnings(suppressMessages(source("D:/pyprojects/trawlcomp/R/fit_models.R")))
 
 catch <- tow_catch(drop_bad_coordinates(select_tows()))

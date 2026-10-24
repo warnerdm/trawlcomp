@@ -4,7 +4,7 @@ suppressWarnings(suppressMessages(source("D:/pyprojects/trawlcomp/R/strata.R")))
 library(patchwork)
 
 CELL_M <- 20
-MIN_FISH <- as.numeric(Sys.getenv("MIN_FISH", 10))   # fish (by number) per tow; 0 = Adams et al. (all tows)
+MIN_FISH <- as.numeric(Sys.getenv("MIN_FISH", 5))    # fish (by number) per tow; 0 = Adams et al. (all tows)
 MIN_TOWS <- as.numeric(Sys.getenv("MIN_TOWS", 5))    # tows per cell; 2 = Adams et al.
 OUT_TAG <- paste0(if (MIN_FISH > 0) paste0("_min", MIN_FISH, "fish") else "", if (MIN_TOWS != 2) paste0("_min", MIN_TOWS, "tows") else "")
 LAKE <- Sys.getenv("LAKE", "Michigan")
