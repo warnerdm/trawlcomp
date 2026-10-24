@@ -122,3 +122,51 @@ combine_region_layers <- function(at, tr) {
     mutate(se_D = sqrt(var_ac + var_tr + var_x), cv_D = se_D / D,
            share_acoustic = var_ac / se_D^2, share_trawl = var_tr / se_D^2, share_product = var_x / se_D^2)
 }
+
+# --- Method 2: bootstrap (user, 2026-10-24) ---
+# Each replicate resamples, with replacement, the transects within each region (acoustic) and the year's tows
+# within each region x layer (trawl; a region x layer without tows that year resamples the year's lake-wide tows
+# of that layer, as in method 1), recomputes D = sum over layers rho_layer x p_layer per region and the area-
+# weighted lake total. mode "both", "acoustic" (tows fixed) or "trawl" (transects fixed) splits the variance.
+# Note: a region x layer with one tow has no bootstrap variance (method 1 borrows an all-years SD instead).
+bootstrap_region_layer <- function(at, props_year, groups, B = 2000, mode = "both", seed = 1) {
+  set.seed(seed)
+  tw <- props_year %>% mutate(layer = layer_of(fishing_depth)) %>%
+    mutate(across(all_of(groups), \(x) x / n))
+  regions <- unique(at$region); layers <- unique(at$layer)
+  area <- distinct(at, region, regarea)
+  # tow pool per region x layer (fallback: lake-wide pool for the layer)
+  pools <- list()
+  for (r in regions) for (l in layers) {
+    d <- filter(tw, region == r, layer == l)
+    if (nrow(d) == 0) d <- filter(tw, layer == l)
+    pools[[paste(r, l)]] <- as.matrix(d[groups])
+  }
+  acw <- at %>% pivot_wider(names_from = layer, values_from = fish_ha, values_fill = 0)
+  out <- vector("list", B)
+  for (b in seq_len(B)) {
+    rows <- list()
+    for (r in regions) {
+      a <- filter(acw, region == r)
+      ia <- if (mode == "trawl") seq_len(nrow(a)) else sample.int(nrow(a), replace = TRUE)
+      rho <- colMeans(as.matrix(a[ia, layers, drop = FALSE]))
+      D <- setNames(numeric(length(groups)), groups)
+      for (l in layers) {
+        pm <- pools[[paste(r, l)]]
+        it <- if (mode == "acoustic") seq_len(nrow(pm)) else sample.int(nrow(pm), replace = TRUE)
+        D <- D + rho[[l]] * colMeans(pm[it, , drop = FALSE])
+      }
+      rows[[r]] <- tibble(b = b, region = r, group = groups, D = D)
+    }
+    out[[b]] <- bind_rows(rows)
+  }
+  bind_rows(out) %>% left_join(area, by = "region")
+}
+
+summarise_boot <- function(bt) {
+  reg <- bt %>% summarise(.by = c(region, group), D_mean = mean(D), se_D = sd(D),
+                          lo = quantile(D, 0.025), hi = quantile(D, 0.975))
+  tot <- bt %>% summarise(.by = c(b, group), N = sum(regarea * D)) %>%
+    summarise(.by = group, N_mean = mean(N), se_N = sd(N), lo = quantile(N, 0.025), hi = quantile(N, 0.975))
+  list(region = reg, total = tot)
+}

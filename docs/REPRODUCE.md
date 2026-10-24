@@ -71,8 +71,9 @@ These are in `R/select_tows.R` (`select_tows()`, `drop_bad_coordinates()`) and `
 | 15 | `15_region_depth_presentation.R` | `region_depth.R` | Presentation framework, both lakes: map of tows by region; composition by fishing depth (0-20/20-40/40-60/60+ m) x bottom depth (0-40/40-80/80-120/120+ m) within each region; table; share of variance explained by region, depth and both | `region_map_<lake>.png`, `region_depth_composition_<lake>.png`, `region_depth_table_<lake>.csv`, `region_depth_variance_<lake>.csv` |
 | 16 | `16_gam_plots.R` (runs right after 03) | `fit_models.R` | Full `summary()` and random-effect SDs of the step-03 GAMs; smooth-term plots (fishing depth, bottom depth, lon x lat surface) | `model_summaries.txt`, `gam_smooths_<lake>_<group>.png` |
 | 17 | `17_two_gear_uncertainty.R` (`YEAR`, default 2021; `FRAME` region_layer (default), region or strata) | `two_gear.R` | Combined acoustic + trawl uncertainty of species density (method 1, analytic), Michigan, by survey region x depth layer (< / >= 40 m; default), region, or depth stratum: EchoNet2Fish fish/ha with transects as sampling units x the year's trawl proportions; share of the variance from each gear; area-weighted lake totals for regions | `two_gear_michigan_<year>_<region_layer/regions/strata>.csv`, `.png`, `..._lake_total.csv`, `..._region_layer_trawl.csv` |
+| 18 | `18_two_gear_bootstrap.R` (`YEAR` default 2021, `B` default 2000) | `two_gear.R` | Method 2: bootstrap of transects (within region) and that year's tows (within region x layer) for species density by region x depth layer; acoustic-only and trawl-only runs split the variance; lake totals compared with method 1 | `two_gear_boot_michigan_<year>_regions.csv`, `..._lake_total.csv` |
 
-Dependencies: 04, 05, 06 and 16 read 03's output; 10 and 17 read 09's output. `run_all.R` runs them in order.
+Dependencies: 04, 05, 06 and 16 read 03's output; 10 and 17 read 09's output; 18 reads 17's lake total for the comparison. `run_all.R` runs them in order.
 
 ## 5. Key settings (change them where listed, then rerun the affected steps)
 

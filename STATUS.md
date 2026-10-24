@@ -108,7 +108,12 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   hypolimnion slice. 2021 lake totals: bloater CV 30% (84% acoustic), alewife CV 32% (60% trawl), smelt CV 85%
   (85% trawl). Fish below 40 m are a few % of the water-column density in every region. Several region x layer
   cells have 1-3 tows; no/so/wn have 2-3 transects.
-- Next if wanted: method 2 (bootstrap transects and tows together).
+- Method 2, bootstrap (analysis 18; 2021, 2,000 replicates): transects resampled within region, that year's
+  tows within region x layer. Lake totals agree with method 1 (alewife 2.58e9, smelt 4.4e8, bloater 4.84e9) but
+  CVs are smaller: alewife 21% (method 1 32%), smelt 32% (85%), bloater 24% (30%). Reasons: the bootstrap uses
+  only that year's tows, so region x layers with 1-3 similar tows have little or no trawl variance (method 1
+  borrows the all-years within-year SD), and bootstrap SEs from 2-3 transects are biased low. Shares: bloater
+  91% acoustic; alewife about half and half; smelt 89% trawl. Method 1 is the more conservative of the two.
 
 ## Open / possible next steps
 - mixedtows reads trawlcomp's mixed_tows() live: with 2019-2024 it now gives 63 Huron mixed tows (41 + 22 from

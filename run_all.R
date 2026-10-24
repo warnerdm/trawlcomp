@@ -22,7 +22,8 @@ steps <- list(
   list("13_region_test", "Michigan"), list("13_region_test", "Huron"),
   list("14_region_depth_strata", "Huron"),
   list("15_region_depth_presentation"),
-  list("17_two_gear_uncertainty")             # Michigan 2021 (YEAR env var); reads 09's output
+  list("17_two_gear_uncertainty"),            # Michigan 2021 (YEAR, FRAME env vars); reads 09's output
+  list("18_two_gear_bootstrap")               # ~1 min; Michigan 2021 bootstrap; compares with 17
 )
 only <- commandArgs(trailingOnly = TRUE)
 if (length(only)) steps <- Filter(\(s) substr(s[[1]], 1, 2) %in% only, steps)
