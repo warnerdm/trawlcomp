@@ -91,7 +91,7 @@ worth it?), not apportioning (user). Selectivity is out of scope.
 
 ## Open / possible next steps
 - mixedtows reads trawlcomp's mixed_tows() live: with 2019-2024 it now gives 63 Huron mixed tows (41 + 22 from
-  2019-2024). mixedtows has not been rerun; decide whether its list should include 2019-2024.
+  2019-2024). DECIDED (user, 2026-10-24): mixedtows includes 2019-2024; its next run picks them up.
 - 58104 fishing depth (279 alewife only at 60.4 m).
 - Size groups (species x length cut) in the stratum framework (theory supports it; needs length data and cuts).
 
