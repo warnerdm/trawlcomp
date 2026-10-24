@@ -42,6 +42,10 @@ Illustrative, simulated: acoustic density 1,000 fish/ha with CV 20%; a main spec
 minor species with p = 0.1 (CV 60%). The product's CV is about sqrt(CV_rho^2 + CV_p^2): 25% for the main species
 (both gears matter) and 63-65% for the minor one (the trawl dominates; the small product term makes up the gap).
 
+A step-by-step version with real data (sn bloater, 2021) is `output/two_gear_worked_sn_bloater_2021.png`
+(step 20): acoustic transect values, tow proportions, transect species densities and the three variance terms
+(acoustic 65%, trawl 33%, product 2%; D = 1,269 bloater/ha, SE 348, CV 27%).
+
 ## Method 1: analytic (step 17)
 
 **Acoustic variance**

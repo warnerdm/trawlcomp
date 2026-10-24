@@ -26,7 +26,8 @@ steps <- list(
   list("18_two_gear_bootstrap"),              # ~1 min; Michigan 2021 bootstrap; compares with 17
   list("17_two_gear_uncertainty", "", c(FRAME = "region_layer_ps")),   # trawl post-strata
   list("18_two_gear_bootstrap", "", c(FRAME = "region_layer_ps")),
-  list("19_two_gear_concept_figure")          # illustrative figure (simulated)
+  list("19_two_gear_concept_figure"),         # illustrative figure (simulated)
+  list("20_two_gear_worked_example")          # method 1 step by step, sn bloater 2021 (REGION, GROUP, YEAR)
 )
 only <- commandArgs(trailingOnly = TRUE)
 if (length(only)) steps <- Filter(\(s) substr(s[[1]], 1, 2) %in% only, steps)
