@@ -6,7 +6,8 @@ fits <- c(fit_lake(catch, "Michigan"), fit_lake(catch, "Huron"))
 
 summ <- map(fits, "summary") %>% list_rbind()
 tows <- map(fits, "tows") %>% list_rbind()
-saveRDS(map(fits, "model"), file.path(OUTPUT_DIR, "models.rds"))
+# named <lake>_<group>, e.g. models$Huron_bloater (interactive use: docs/REPRODUCE.md section 7)
+saveRDS(setNames(map(fits, "model"), paste(summ$lake, summ$group, sep = "_")), file.path(OUTPUT_DIR, "models.rds"))
 write_csv(summ, file.path(OUTPUT_DIR, "model_summary.csv"))
 write_csv(tows, file.path(OUTPUT_DIR, "repeat_tow_stats.csv"))
 

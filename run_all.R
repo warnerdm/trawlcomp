@@ -10,6 +10,7 @@ steps <- list(
   list("01_tow_layout"),
   list("02_composition_plots"),
   list("03_fit_models"),                      # ~15 min; 04-06 read its output
+  list("16_gam_plots"),                       # ~4 min; summaries and smooth plots of 03's models
   list("04_se_vs_tows"),
   list("05_effort"),
   list("06_subsample"),

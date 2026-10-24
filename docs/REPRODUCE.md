@@ -21,7 +21,7 @@ All paths are set in `R/paths.R` (plus `EN2F_DIR` in `R/acoustic.R`). Nothing ou
 "C:\Program Files\R\R-4.4.0\bin\Rscript.exe" D:\pyprojects\trawlcomp\run_all.R
 ```
 
-About 17 minutes, 15 of them in step 03. Each step runs in its own R process; one line per step is printed
+About 21 minutes: 15 in step 03 and 4 in step 16 (summaries of the large models). Each step runs in its own R process; one line per step is printed
 (`ok` or `FAILED`), and each step's console output goes to `output/logs/<step>[_<lake>].log`. To rerun only some
 steps, list their numbers: `Rscript run_all.R 08 09 10`.
 
@@ -69,8 +69,9 @@ These are in `R/select_tows.R` (`select_tows()`, `drop_bad_coordinates()`) and `
 | 13 | `13_region_test.R` (per lake) | `stratum_stats.R` | Does composition differ by survey region (transect prefix) within the strata? | `region_effects_<lake>.csv` |
 | 14 | `14_region_depth_strata.R` (Huron) | `stratum_stats.R` | Region x depth strata: mean, SD, SE per stratum x region; variance gain from splitting each depth stratum by region at the same total tows | `region_depth_stats_<lake>.csv`, `region_split_gain_<lake>.csv`, `region_depth_<lake>.png` |
 | 15 | `15_region_depth_presentation.R` | `region_depth.R` | Presentation framework, both lakes: map of tows by region; composition by fishing depth (0-20/20-40/40-60/60+ m) x bottom depth (0-40/40-80/80-120/120+ m) within each region; table; share of variance explained by region, depth and both | `region_map_<lake>.png`, `region_depth_composition_<lake>.png`, `region_depth_table_<lake>.csv`, `region_depth_variance_<lake>.csv` |
+| 16 | `16_gam_plots.R` (runs right after 03) | `fit_models.R` | Full `summary()` and random-effect SDs of the step-03 GAMs; smooth-term plots (fishing depth, bottom depth, lon x lat surface) | `model_summaries.txt`, `gam_smooths_<lake>_<group>.png` |
 
-Dependencies: 04, 05 and 06 read 03's output; 10 reads 09's output. `run_all.R` runs them in order.
+Dependencies: 04, 05, 06 and 16 read 03's output; 10 reads 09's output. `run_all.R` runs them in order.
 
 ## 5. Key settings (change them where listed, then rerun the affected steps)
 
@@ -94,3 +95,27 @@ Dependencies: 04, 05 and 06 read 03's output; 10 reads 09's output. `run_all.R` 
 - **Species density**: with an acoustic total D, the species density is D x p, with SE = D x SE(p) and
   CV = SE(p) / p; combined with the acoustic CV as sqrt(CV_acoustic^2 + CV_p^2).
 - Field definitions of the stratum table are in the header of `R/stratum_stats.R`.
+
+## 7. Working with the fitted GAMs interactively
+
+Step 03 saves the 7 fitted models (Michigan alewife, smelt, bloater; Huron alewife, smelt, bloater, other) in
+`output/models.rds` as a named list. In R 4.4.0 (e.g. RStudio with `trawlcomp.Rproj`):
+
+```r
+library(mgcv)
+models <- readRDS("D:/pyprojects/trawlcomp/output/models.rds")
+names(models)                        # "Michigan_alewife" ... "Huron_other"
+m <- models$Huron_bloater
+summary(m)                           # smooth terms, edf, p-values
+gam.vcomp(m, rescale = FALSE)        # random-effect SDs (year; tow by layer), logit scale
+plot(m, select = 1, shade = TRUE, seWithMean = TRUE)   # 1 fishing depth, 2 bottom depth
+plot(m, select = 3, scheme = 2)      # 3 the lon x lat surface
+head(m$model)                        # the data the model was fitted to (one row per tow)
+gam.check(m)                         # basis-size checks
+```
+
+The response is each tow's count of the group out of all fish of the groups (`cbind(y, n - y)`). Each tow has
+its own random effect, so "deviance explained" is close to 100% and is not a measure of fit; the tow SDs are
+the quantity of interest. `predict(m, newdata, exclude = c("s(year)", "s(tow):layer< 35 m", "s(tow):layer>= 35 m"),
+type = "response")` gives the mean proportion for a new tow in an average year (newdata needs every model
+variable, including a valid `tow`, `year` and `layer` level).

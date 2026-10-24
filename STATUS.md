@@ -36,6 +36,8 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   0.5-2.1.
 - A single tow's proportion has SD ~0.2-0.35, 3-6x the binomial SD; effective n per tow ~ n / 16-35, with a
   ceiling of ~1/rho (~2-3 fish). Precision comes from the number of tows, not fish per tow.
+- Model summaries and smooth plots: analysis 16 (output/model_summaries.txt, gam_smooths_<lake>_<group>.png);
+  output/models.rds is a named list (e.g. models$Huron_bloater) for interactive summary()/plot() (REPRODUCE.md s. 7).
 - Subsampling check: real within-year SD / model SD (RMS over years) 1.05-1.47: the model is modestly optimistic.
 - Fishing depth is the main gradient in both lakes; location matters too (s(lon, lat) significant everywhere).
 
