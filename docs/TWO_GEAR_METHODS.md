@@ -118,11 +118,14 @@ Code: `R/two_gear.R`; scripts `analysis/17_two_gear_uncertainty.R` (method 1) an
 
 ## Suggested methods text
 
-> For each survey region, species density was the sum over two depth layers (< 40 m and >= 40 m) of acoustic
-> fish density times the trawl proportion of the species in that layer. Acoustic density was the mean of
-> transect values, each the mean of its intervals' summed layer densities, with transects as the sampling
-> units. Trawl proportions were the mean of the year's tow proportions in the region and layer (the year's
-> lake-wide layer proportion where a region had no tows in a layer). Acoustic variance was estimated from the
+> For each survey region, species density was the sum over two depth layers (< 40 m and >= 40 m) of the
+> region's acoustic fish density in the layer times the species' trawl proportion for the same region and
+> layer. Acoustic density was the mean of transect values, each the mean of its intervals' summed layer
+> densities, with transects as the sampling units. Each tow's proportion of a species was its catch of the
+> species divided by its catch of the three species (by number); the trawl proportion for a region and layer
+> was the mean of these tow proportions over the year's tows in that region whose fishing depth fell in the
+> layer, each tow weighted equally (the year's lake-wide proportion for the layer where a region had no tows
+> in it). Acoustic variance was estimated from the
 > transect-to-transect variation of each transect's whole-water-column species density, with the proportions
 > held fixed, which retains the covariance between layers. Trawl variance used the pooled within-year SD of
 > tow proportions for the region and layer, estimated from all survey years (2004-2024), divided by the square
