@@ -72,9 +72,12 @@ pD <- ggplot(vt, aes(term, value, fill = term)) +
   geom_text(aes(label = sprintf("%s\n%.0f (%.0f%%)", how, value, 100 * value / tot)), vjust = -0.15, size = 3) +
   scale_fill_manual(values = c(acoustic = "steelblue", trawl = "darkorange", product = "grey60"), guide = "none") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.35))) +
-  labs(x = NULL, y = "Variance of D", title = "D. Add the variances",
+  labs(x = NULL, y = paste0("Contribution to the variance of
+species density, (", GROUP, "/ha)^2"),
+       title = "D. Add the variance contributions (all in density units)",
+       caption = "Trawl bar = the proportion's variance converted to density units (x rho^2); product = both uncertainties together.",
        subtitle = sprintf("Var = %.0f; SE = sqrt(Var) = %.0f; CV = %.0f / %.0f = %.0f%%", tot, sqrt(tot), sqrt(tot), Dm, 100 * sqrt(tot) / Dm)) +
-  theme_bw(base_size = 10)
+  theme_bw(base_size = 10) + theme(plot.caption = element_text(hjust = 0, size = 8))
 
 p <- (pA | pB) / (pC | pD) +
   plot_annotation(title = sprintf("Method 1 step by step: %s in region %s, %d (region x layer, split at 40 m)", GROUP, REGION, YEAR),
