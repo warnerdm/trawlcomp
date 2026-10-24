@@ -36,6 +36,12 @@ Code: `R/two_gear.R`; scripts `analysis/17_two_gear_uncertainty.R` (method 1) an
 - If the region x layer has **no tows that year**, the year's lake-wide proportion for that layer is used, as in
   EchoNet2Fish's lake-wide hypolimnion slice. This is flagged as `p_source = "lake layer"`.
 
+## Picture of the idea (step 19, `output/two_gear_concept.png`)
+
+Illustrative, simulated: acoustic density 1,000 fish/ha with CV 20%; a main species with p = 0.5 (CV 15%) and a
+minor species with p = 0.1 (CV 60%). The product's CV is about sqrt(CV_rho^2 + CV_p^2): 25% for the main species
+(both gears matter) and 63-65% for the minor one (the trawl dominates; the small product term makes up the gap).
+
 ## Method 1: analytic (step 17)
 
 **Acoustic variance**
