@@ -62,7 +62,7 @@ Code: `R/two_gear.R`; scripts `analysis/17_two_gear_uncertainty.R` (method 1) an
 | 3 | 1,200 | 60 | 360 + 57 = 417 |
 
 The region's bloater density is the mean of D_t (285 bloater/ha); its acoustic variance is the variance of the
-three D_t values divided by 3 (SD 129, so Var_ac = 129^2 / 3 = 5,547; SE 74.5).
+three D_t values divided by 3 (SD 128.6, so Var_ac = 128.6^2 / 3 = 5,516; SE 74.3).
 
 **Trawl variance**
 - SE(p_rls) = SD_rls / sqrt(n), where n = the number of that year's tows used for p.
