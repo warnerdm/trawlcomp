@@ -91,6 +91,15 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   midwater 68, mid-lake 355, offshore 433, deep 18.5. All water below 40 m is ~0-1 fish/ha in 2004-2010 in these
   files (inside and outside the deep stratum). Paused (user).
 
+### 4. Two-gear uncertainty (analysis 17; method 1, analytic; 2026-10-24)
+- Species density D = rho x p per Michigan stratum for one year; rho = EchoNet2Fish fish/ha (in-situ TS, so the
+  gears are independent; user), transects as sampling units; p = that year's tows, SE from the pooled
+  within-year tow SD. Var(D) = p^2 Var(rho) + rho^2 Var(p) + Var(rho) Var(p) (Goodman 1960).
+- 2021 (most tows): the acoustic term dominates the dominant species (deep bloater 99%, CV 42%; nearshore
+  alewife 75%, CV 30%; mid-lake bloater 79%) and the trawl term dominates minor species (smelt 62-88%; CVs
+  0.4 to >1). 2024 the same pattern (surface offshore: 2 transects, 1 tow, CV ~100%).
+- Next if wanted: method 2 (bootstrap transects and tows together).
+
 ## Open / possible next steps
 - mixedtows reads trawlcomp's mixed_tows() live: with 2019-2024 it now gives 63 Huron mixed tows (41 + 22 from
   2019-2024). DECIDED (user, 2026-10-24): mixedtows includes 2019-2024; its next run picks them up.

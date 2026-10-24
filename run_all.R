@@ -21,7 +21,8 @@ steps <- list(
   list("12_acoustic_fish_ha_years"),
   list("13_region_test", "Michigan"), list("13_region_test", "Huron"),
   list("14_region_depth_strata", "Huron"),
-  list("15_region_depth_presentation")
+  list("15_region_depth_presentation"),
+  list("17_two_gear_uncertainty")             # Michigan 2021 (YEAR env var); reads 09's output
 )
 only <- commandArgs(trailingOnly = TRUE)
 if (length(only)) steps <- Filter(\(s) substr(s[[1]], 1, 2) %in% only, steps)

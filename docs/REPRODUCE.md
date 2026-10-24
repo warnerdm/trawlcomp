@@ -70,8 +70,9 @@ These are in `R/select_tows.R` (`select_tows()`, `drop_bad_coordinates()`) and `
 | 14 | `14_region_depth_strata.R` (Huron) | `stratum_stats.R` | Region x depth strata: mean, SD, SE per stratum x region; variance gain from splitting each depth stratum by region at the same total tows | `region_depth_stats_<lake>.csv`, `region_split_gain_<lake>.csv`, `region_depth_<lake>.png` |
 | 15 | `15_region_depth_presentation.R` | `region_depth.R` | Presentation framework, both lakes: map of tows by region; composition by fishing depth (0-20/20-40/40-60/60+ m) x bottom depth (0-40/40-80/80-120/120+ m) within each region; table; share of variance explained by region, depth and both | `region_map_<lake>.png`, `region_depth_composition_<lake>.png`, `region_depth_table_<lake>.csv`, `region_depth_variance_<lake>.csv` |
 | 16 | `16_gam_plots.R` (runs right after 03) | `fit_models.R` | Full `summary()` and random-effect SDs of the step-03 GAMs; smooth-term plots (fishing depth, bottom depth, lon x lat surface) | `model_summaries.txt`, `gam_smooths_<lake>_<group>.png` |
+| 17 | `17_two_gear_uncertainty.R` (`YEAR`, default 2021) | `two_gear.R` | Combined acoustic + trawl uncertainty of species density per Michigan stratum (method 1, analytic): EchoNet2Fish fish/ha by stratum with transects as sampling units, x the year's trawl proportions (SE from the pooled within-year tow SD); share of the variance from each gear | `two_gear_michigan_<year>.csv`, `.png` |
 
-Dependencies: 04, 05, 06 and 16 read 03's output; 10 reads 09's output. `run_all.R` runs them in order.
+Dependencies: 04, 05, 06 and 16 read 03's output; 10 and 17 read 09's output. `run_all.R` runs them in order.
 
 ## 5. Key settings (change them where listed, then rerun the affected steps)
 
