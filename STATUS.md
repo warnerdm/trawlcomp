@@ -92,13 +92,17 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   files (inside and outside the deep stratum). Paused (user).
 
 ### 4. Two-gear uncertainty (analysis 17; method 1, analytic; 2026-10-24)
-- Species density D = rho x p per Michigan stratum for one year; rho = EchoNet2Fish fish/ha (in-situ TS, so the
-  gears are independent; user), transects as sampling units; p = that year's tows, SE from the pooled
-  within-year tow SD. Var(D) = p^2 Var(rho) + rho^2 Var(p) + Var(rho) Var(p) (Goodman 1960).
-- 2021 (most tows): the acoustic term dominates the dominant species (deep bloater 99%, CV 42%; nearshore
-  alewife 75%, CV 30%; mid-lake bloater 79%) and the trawl term dominates minor species (smelt 62-88%; CVs
-  0.4 to >1). 2024 the same pattern (surface offshore: 2 transects, 1 tow, CV ~100%).
-- Next if wanted: method 2 (bootstrap transects and tows together).
+- Species density D = rho x p; Var(D) = p^2 Var(rho) + rho^2 Var(p) + Var(rho) Var(p) (Goodman 1960); gears
+  independent because sigma is in-situ TS (user). Default frame: the survey regions nn/no/sn/so/wn (user; as
+  EchoNet2Fish; FRAME=strata gives the depth-strata version). rho = EchoNet2Fish water-column fish/ha (interval =
+  sum of layers), transects as units; p = that year's tows (>= 5 fish, all fishing depths) in the region, SE from
+  the region's pooled within-year SD. Lake total = sum(regarea x D). Default year 2021 (most tows; user).
+- 2021 lake totals: bloater CV 29% (87% acoustic), alewife CV 33% (59% trawl), smelt CV 72% (83% trawl).
+  By region: so bloater 0.92 of the catch, CV 40% (90% acoustic); nn all species trawl-dominated (81-94%; acoustic
+  CV only 13%, 7 transects). no, so, wn have 2-3 transects in 2021, so their acoustic SEs are rough.
+- Caveat: tow proportions pooled over all fishing depths are applied to whole-water-column density; composition
+  changes strongly with depth, so a region x depth-layer version (as EchoNet2Fish's epi/hypo slices) would match
+  them better. Next if wanted: that, and method 2 (bootstrap).
 
 ## Open / possible next steps
 - mixedtows reads trawlcomp's mixed_tows() live: with 2019-2024 it now gives 63 Huron mixed tows (41 + 22 from

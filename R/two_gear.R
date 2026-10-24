@@ -35,3 +35,36 @@ combine_gears <- function(ac, tr) {
            se_D = sqrt(var_ac + var_tr + var_x), cv_D = se_D / D,
            share_acoustic = var_ac / se_D^2, share_trawl = var_tr / se_D^2, share_product = var_x / se_D^2)
 }
+
+# --- Survey regions as the strata (user, 2026-10-24: sn/nn/no/wn/so, as EchoNet2Fish) ---
+# Acoustic: an interval's water-column density = sum of its layers' fish_ha (EchoNet2Fish's interval totals equal
+# the layer sums); transect mean over its intervals; region mean over transects, SE = SD / sqrt(transects).
+# regarea (ha... as in the file) is kept for area-weighted lake totals.
+acoustic_by_region <- function(year) {
+  read_intlay(year) %>%
+    summarise(.by = c(region, regarea, Region_name, Interval), fish_ha = sum(fish_ha)) %>%
+    summarise(.by = c(region, regarea, Region_name), intervals = n(), fish_ha = mean(fish_ha)) %>%
+    summarise(.by = c(region, regarea), transects = n(), intervals = sum(intervals),
+              rho = mean(fish_ha), se_rho = sd(fish_ha) / sqrt(n())) %>%
+    mutate(cv_rho = se_rho / rho)
+}
+
+# Trawl: that year's tows in the region (all fishing depths), mean of tow proportions; SE from the region's pooled
+# within-year tow SD (all years) / sqrt(that year's tows). props needs region and YEAR.
+trawl_by_region <- function(props, year, groups) {
+  long <- props %>% pivot_longer(all_of(groups), names_to = "group", values_to = "count") %>% mutate(p = count / n)
+  sdw <- long %>% summarise(.by = c(region, group), tows_all = n(), years_all = n_distinct(YEAR),
+                            sd_within = sqrt(sum((p - ave(p, YEAR))^2) / (n() - n_distinct(YEAR))))
+  long %>% filter(YEAR == year) %>%
+    summarise(.by = c(region, group), tows = n(), p = mean(p)) %>%
+    left_join(sdw, by = c("region", "group")) %>%
+    mutate(se_p = sd_within / sqrt(tows), cv_p = se_p / p)
+}
+
+# Area-weighted lake total per group: N = sum(regarea * D), Var = sum(regarea^2 Var(D)) (regions independent)
+lake_total <- function(res) {
+  res %>% summarise(.by = group, N = sum(regarea * D), se_N = sqrt(sum(regarea^2 * se_D^2)),
+                    var_ac = sum(regarea^2 * var_ac), var_tr = sum(regarea^2 * var_tr)) %>%
+    mutate(cv_N = se_N / N, share_acoustic = var_ac / se_N^2, share_trawl = var_tr / se_N^2) %>%
+    select(-var_ac, -var_tr)
+}
