@@ -30,7 +30,7 @@ tot <- runs$both$total %>%
 
 m1 <- file.path(OUTPUT_DIR, paste0("two_gear_michigan_", YEAR, "_", FRAME, "_lake_total.csv"))
 if (file.exists(m1)) tot <- tot %>% left_join(read_csv(m1, show_col_types = FALSE) %>%
-                                                select(group, N_m1 = N, se_m1 = se_N, cv_m1 = cv_N), by = "group")
+                                                select(group, density_m1 = density, se_density_m1 = se_density, cv_m1 = cv_N), by = "group")
 write_csv(reg, file.path(OUTPUT_DIR, paste0("two_gear_boot_michigan_", YEAR, "_", FRAME, "_regions.csv")))
 write_csv(tot, file.path(OUTPUT_DIR, paste0("two_gear_boot_michigan_", YEAR, "_", FRAME, "_lake_total.csv")))
 
@@ -38,5 +38,5 @@ options(width = 220)
 cat("Bootstrap,", B, "replicates. By region (fish/ha):\n")
 print(as.data.frame(reg %>% transmute(region, group, D = round(D_mean, 1), se = round(se_D, 1), cv = round(cv, 2),
   lo = round(lo, 1), hi = round(hi, 1), acoustic = round(share_acoustic, 2), trawl = round(share_trawl, 2))))
-cat("\nLake totals (fish), bootstrap vs method 1:\n")
+cat("\nLake-wide mean density (fish/ha) and totals (fish), bootstrap vs method 1:\n")
 print(as.data.frame(mutate(tot, across(where(is.double), \(x) signif(x, 3)))))

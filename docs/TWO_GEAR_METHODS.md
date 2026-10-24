@@ -10,6 +10,7 @@ Code: `R/two_gear.R`; scripts `analysis/17_two_gear_uncertainty.R` (method 1) an
   - rho_rl: acoustic fish density in layer l of region r (fish/ha).
   - p_rls: trawl proportion of species s in layer l of region r.
 - Lake total: **N_s = sum over regions of A_r x D_rs**, with A_r the region area (`regarea` in the EchoNet2Fish file).
+- Lake-wide mean density: **N_s / sum of A_r** (fish/ha); same CV as the total. Both are in the lake-total CSVs.
 - Regions: nn, no, sn, so, wn (Michigan nne, nnw and nnlu pooled into nn). Layers: < 40 m and >= 40 m.
 - Species: alewife, rainbow smelt, bloater (proportions by number).
 

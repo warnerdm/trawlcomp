@@ -61,12 +61,14 @@ trawl_by_region <- function(props, year, groups) {
     mutate(se_p = sd_within / sqrt(tows), cv_p = se_p / p)
 }
 
-# Area-weighted lake total per group: N = sum(regarea * D), Var = sum(regarea^2 Var(D)) (regions independent)
+# Area-weighted lake total per group: N = sum(regarea * D), Var = sum(regarea^2 Var(D)) (regions independent);
+# lake-wide mean density = N / sum(regarea) (fish/ha; same CV as N)
 lake_total <- function(res) {
-  res %>% summarise(.by = group, N = sum(regarea * D), se_N = sqrt(sum(regarea^2 * se_D^2)),
+  res %>% summarise(.by = group, area = sum(regarea), N = sum(regarea * D), se_N = sqrt(sum(regarea^2 * se_D^2)),
                     var_ac = sum(regarea^2 * var_ac), var_tr = sum(regarea^2 * var_tr)) %>%
-    mutate(cv_N = se_N / N, share_acoustic = var_ac / se_N^2, share_trawl = var_tr / se_N^2) %>%
-    select(-var_ac, -var_tr)
+    mutate(density = N / area, se_density = se_N / area,
+           cv_N = se_N / N, share_acoustic = var_ac / se_N^2, share_trawl = var_tr / se_N^2) %>%
+    select(group, density, se_density, N, se_N, cv_N, share_acoustic, share_trawl, area)
 }
 
 # --- Survey regions x depth layer (user, 2026-10-24: layers split at 40 m) ---
@@ -168,8 +170,10 @@ bootstrap_region_layer <- function(at, props_year, groups, B = 2000, mode = "bot
 summarise_boot <- function(bt) {
   reg <- bt %>% summarise(.by = c(region, group), D_mean = mean(D), se_D = sd(D),
                           lo = quantile(D, 0.025), hi = quantile(D, 0.975))
+  area <- sum(distinct(bt, region, regarea)$regarea)
   tot <- bt %>% summarise(.by = c(b, group), N = sum(regarea * D)) %>%
-    summarise(.by = group, N_mean = mean(N), se_N = sd(N), lo = quantile(N, 0.025), hi = quantile(N, 0.975))
+    summarise(.by = group, N_mean = mean(N), se_N = sd(N), lo = quantile(N, 0.025), hi = quantile(N, 0.975)) %>%
+    mutate(density = N_mean / area, se_density = se_N / area, density_lo = lo / area, density_hi = hi / area)
   list(region = reg, total = tot)
 }
 

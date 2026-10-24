@@ -119,6 +119,9 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   totals: alewife 3.35e9 (CV 22% method 1 / 20% bootstrap), smelt 0.67e9 (35% / 29%), bloater 3.86e9 (25% /
   22%): the methods now agree. Totals shift vs region x layer (so's 4 upper tows, bloater 0.86, vs the south
   half's 0.55): bias-variance trade-off. Details in docs/TWO_GEAR_METHODS.md.
+- Lake-wide mean density (fish/ha, = total / summed region area) added to the lake-total CSVs. 2021, method 1 /
+  bootstrap: region x layer alewife 528 (CV 32% / 21%), smelt 91 (85% / 32%), bloater 995 (30% / 24%); post-strata
+  alewife 686-693 (22% / 20%), smelt 138 (35% / 29%), bloater 791 (25% / 22%). Bloater = all sizes, by number.
 
 ## Open / possible next steps
 - mixedtows reads trawlcomp's mixed_tows() live: with 2019-2024 it now gives 63 Huron mixed tows (41 + 22 from

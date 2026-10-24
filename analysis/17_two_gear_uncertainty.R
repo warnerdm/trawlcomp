@@ -59,7 +59,7 @@ print(as.data.frame(res %>% transmute(unit, group, tows, p = round(p, 3), cv_p =
   D = round(D, 1), se_D = round(se_D, 1), cv_D = round(cv_D, 2), acoustic = round(share_acoustic, 2),
   trawl = round(share_trawl, 2), product = round(share_product, 2))))
 if (FRAME %in% c("region", "region_layer", "region_layer_ps")) {
-  cat("\nLake total (sum of region area x density; units of regarea x fish/ha):\n")
+  cat("\nLake-wide mean density (fish/ha; = area-weighted total / total area) and total (fish):\n")
   print(as.data.frame(mutate(tot, across(where(is.double), \(x) signif(x, 3)))))
 }
 
