@@ -9,7 +9,7 @@ dir.create(file.path(root, "output", "logs"), showWarnings = FALSE, recursive = 
 steps <- list(
   list("01_tow_layout"),
   list("02_composition_plots"),
-  list("03_fit_models"),                      # ~2 min; 04-06 read its output
+  list("03_fit_models"),                      # ~15 min; 04-06 read its output
   list("04_se_vs_tows"),
   list("05_effort"),
   list("06_subsample"),

@@ -25,7 +25,9 @@ read_catch <- function() {
     mutate(lake = "Michigan")
   hu <- read_trawl("TR_CATCH.csv", col_types = cols(.default = "c")) %>%
     mutate(lake = "Huron")
-  bind_rows(mi, hu) %>%
+  hu2 <- read_csv(HU_RECENT_CATCH, show_col_types = FALSE, col_types = cols(.default = "c"), na = c("", "NA", "NULL")) %>%
+    mutate(lake = "Huron")   # Huron 2019-2024
+  bind_rows(mi, hu, hu2) %>%
     transmute(OP_ID = as.integer(OP_ID), lake, SPECIES = as.integer(SPECIES), N = as.numeric(N),
               WEIGHT = as.numeric(WEIGHT))
 }

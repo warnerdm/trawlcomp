@@ -1,8 +1,8 @@
 # Acoustic-survey tows (user, 2026-10-14).
 # Michigan: every tow in the bloaterTS per-year files (L_2_Y_<year>_Acoustic_optrop.csv) and only those;
 #   the USGS release (OP.csv and associated files) is never used for Michigan.
-# Huron: the USGS release (OP.csv, doi:10.5066/F75M63X0 ver. 3.0), OP_TARGET.csv TARGET %in% c(209, 210),
-#   with bloaterTS's filter (2004+, SAMPLE_TYPE 1, vessels 17/35/88).
+# Huron: the USGS release (OP.csv, doi:10.5066/F75M63X0 ver. 3.0; 2004-2018) and bloaterTS's 2019-2024 file
+#   (OP_TR.OP_OP_target_huron.csv), TARGET %in% c(209, 210), 2004+, SAMPLE_TYPE 1, vessels 17/35/88.
 library(tidyverse)
 source("D:/pyprojects/trawlcomp/R/paths.R")
 
@@ -47,7 +47,15 @@ select_tows <- function() {
               by = "OP_ID") %>%
     tow_fields("Huron")
 
-  tows <- bind_rows(mi, hu)
+  # Huron 2019-2024: one file with OP, TR_OP and TARGET joined (repeated column names made unique; NULL = NA).
+  # Same filter as the release; vessel 37 did no Huron survey midwater tows (user, 2026-10-24).
+  hu2 <- read_csv(HU_RECENT_OP, show_col_types = FALSE, col_types = cols(.default = "c"), na = c("", "NA", "NULL"),
+                  name_repair = \(x) make.unique(x, sep = "_dup")) %>%
+    filter(LAKE == "3" & as.integer(YEAR) >= 2004 & SAMPLE_TYPE == "1" & VESSEL %in% c("17", "35", "88") &
+             as.integer(TARGET) %in% ACOUSTIC_TARGETS) %>%
+    tow_fields("Huron")
+
+  tows <- bind_rows(mi, hu, hu2)
   stopifnot(!any(duplicated(tows$OP_ID)))
   tows
 }

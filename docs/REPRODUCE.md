@@ -21,7 +21,7 @@ All paths are set in `R/paths.R` (plus `EN2F_DIR` in `R/acoustic.R`). Nothing ou
 "C:\Program Files\R\R-4.4.0\bin\Rscript.exe" D:\pyprojects\trawlcomp\run_all.R
 ```
 
-About 10 minutes, 8 of them in step 03. Each step runs in its own R process; one line per step is printed
+About 17 minutes, 15 of them in step 03. Each step runs in its own R process; one line per step is printed
 (`ok` or `FAILED`), and each step's console output goes to `output/logs/<step>[_<lake>].log`. To rerun only some
 steps, list their numbers: `Rscript run_all.R 08 09 10`.
 
@@ -34,9 +34,10 @@ These are in `R/select_tows.R` (`select_tows()`, `drop_bad_coordinates()`) and `
 
 1. **Tows.** Michigan: every tow in the bloaterTS files `L_2_Y_<year>_Acoustic_optrop.csv` (2004-2024, no
    2020), and only those. Huron: the USGS ScienceBase release (doi:10.5066/F75M63X0), `OP.csv` with
-   `OP_TARGET.csv` TARGET 209 or 210, 2004 on, SAMPLE_TYPE 1, vessels 17, 35, 88.
+   `OP_TARGET.csv` TARGET 209 or 210, 2004 on, SAMPLE_TYPE 1, vessels 17, 35, 88; 2004-2018 from the release, 2019-2024 from bloaterTS's
+   `OP_TR.OP_OP_target_huron.csv` and `TR_catch_Huron.csv` (same fields; `NULL` = missing).
 2. **Coordinates.** Tows with missing start coordinates or coordinates outside the lake's box are dropped
-   (11 Huron tows).
+   (12 Huron tows).
 3. **Bottom depth** = mean of BEG_DEPTH and END_DEPTH, with a depth of 0 treated as not recorded. Michigan 2008
    vessel 17 bottom depths are in feet (x 0.3048). Michigan 77542 and 104167 have no usable bottom depth.
 4. **Catch.** Michigan catch from `L_2_Y_<year>_Acoustic_tr_catch.csv` only; Huron from the release's

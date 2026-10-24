@@ -12,9 +12,11 @@ worth it?), not apportioning (user). Selectivity is out of scope.
 ## Data and data rules (all applied in code; R/select_tows.R, R/tow_catch.R)
 - Michigan: tows, catch and lengths ONLY from bloaterTS `L_2_Y_<year>_Acoustic_*` files, 2004-2024 (no 2020);
   701 tows. Huron: USGS release (OP, OP_TARGET TARGET 209/210, TR_OP, TR_CATCH), 2004+, SAMPLE_TYPE 1, vessels
-  17/35/88; 493 tows (2004-2018, none in 2006). All tows are night tows of the lakewide acoustic surveys.
-- Bad coordinates dropped: 11 Huron tows (89398-89404 not decimal degrees; 76630, 78281, 83500 missing; 57431
-  off the lake). Leaves Michigan 701, Huron 482.
+  17/35/88; 493 tows (2004-2018, none in 2006). Huron 2019-2024 (user, 2026-10-24): bloaterTS
+  OP_TR.OP_OP_target_huron.csv + TR_catch_Huron.csv, same filter (vessel 37 did no Huron survey midwater tows,
+  user): 257 tows. All tows are night tows of the lakewide acoustic surveys.
+- Bad coordinates dropped: 12 Huron tows (89398-89404 not decimal degrees; 76630, 78281, 83500 missing; 57431
+  off the lake; 124850, 2023 SD_Comp05, lon -43.56). Leaves Michigan 701, Huron 738.
 - Bottom depth = mean of BEG_DEPTH and END_DEPTH; a depth of 0 = not recorded (all 11 2019 vessel 17 END_DEPTH);
   2008 Michigan vessel 17 bottom depths are in feet (x 0.3048); 77542 and 104167 bottom depth NA (as bloaterTS).
 - Groups: alewife (106), smelt (109), bloater (204); Huron also "other" (all other species). Michigan has no
@@ -24,7 +26,7 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   42 tows; 7 Michigan tows then have no fish (58104, 279 alewife at 60.4 m, is odd; not acted on).
 - Weight: a tow with a missing (or 0 with fish counted) weight for any group it caught drops out of weight
   proportions (38 Michigan tows; a few Huron tows with missing "other" weight).
-- Tows with fish in the groups: Michigan 651, Huron 469.
+- Tows with fish in the groups: Michigan 651, Huron 725.
 
 ## Results (current)
 ### 1. Tow-level model (analyses 02-06; all tows with >= 1 fish)
@@ -46,9 +48,12 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   surface offshore 20 (1/yr), deep 55 (3/yr). By number, mean / SE at current effort (all-years SD):
   nearshore alewife 0.74 / 0.09; midwater alewife 0.47, smelt 0.31, bloater 0.22, SEs 0.25-0.29; deep bloater
   0.98 / 0.05.
-- Huron (415 tows), strata named by range: fishing 0-40 m over 0-40 m bottom (110; smelt 0.79), 0-40 m over
-  40-120 m (199; smelt 0.60, bloater 0.26, other 0.12), 20-40 m over 80-120 m (16; smelt 0.81), 40-80 m over
-  40-120 m (83; bloater 0.74, SD 0.30), 0-20 m over 120-140 m (7; mixed).
+- Huron 2004-2024 (667 tows in strata; re-clustered with the 2019-2024 tows), strata named by range: fishing
+  0-40 m over 0-40 m bottom (162; smelt 0.80), 0-40 m over 40-140 m (309; smelt 0.57, bloater 0.27, other 0.12),
+  20-40 m over 80-140 m (33; smelt 0.77), 40-60 m over 40-120 m (89; bloater 0.70, SD 0.35), 60-100 m over
+  80-140 m (74; bloater 0.86, SD 0.21). (2004-2018 version had one deep stratum 40-80 m, bloater 0.74, and a
+  7-tow surface cell over 120-140 m.) Region x depth and region tests were rerun; figures in STATUS below this
+  line for Huron predate the 2019-2024 data unless stated.
 - One Michigan deep tow estimates the bloater share as precisely as ~20 Michigan surface-nearshore tows estimate
   the alewife share (~40 on a CV basis); ~14 Huron deep tows.
 - Small groups have small absolute SEs but large CVs (e.g. Huron other: SE 0.06, CV ~48%).
@@ -75,7 +80,8 @@ worth it?), not apportioning (user). Selectivity is out of scope.
 - Michigan (555 tows): depth explains alewife 31%, bloater 50%, smelt 6%; region alewife 1%, bloater 8%, smelt
   15%; region x depth 27-58%; unexplained 42-73%. Huron (440): depth smelt 33%, bloater 41%; region 23-26%;
   region x depth 50-62%; alewife and other mostly unexplained (78-86%). Huron sg (2 tows, Saginaw Bay mouth,
-  15 Sep 2018) pooled into mw (user, 2026-10-24); 5 Huron regions.
+  15 Sep 2018) pooled into mw (user, 2026-10-24); 5 Huron regions. With 2019-2024 (686 tows): depth smelt 35%,
+  bloater 44%; region 22%; region x depth 51-61%; alewife and other 82-86% unexplained.
 
 ### 3. Acoustic (analysis 12; EchoNet2Fish intlaymeans_nph, 2004-2024)
 - Interval x 10 m layer fish_ha placed in the Michigan strata cells; NA/Inf = 0 (user; as EchoNet2Fish's own
@@ -84,6 +90,8 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   files (inside and outside the deep stratum). Paused (user).
 
 ## Open / possible next steps
+- mixedtows reads trawlcomp's mixed_tows() live: with 2019-2024 it now gives 63 Huron mixed tows (41 + 22 from
+  2019-2024). mixedtows has not been rerun; decide whether its list should include 2019-2024.
 - 58104 fishing depth (279 alewife only at 60.4 m).
 - Size groups (species x length cut) in the stratum framework (theory supports it; needs length data and cuts).
 
