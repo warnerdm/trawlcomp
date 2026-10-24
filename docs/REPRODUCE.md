@@ -1,7 +1,8 @@
 # Reproducing trawlcomp
 
 How to rebuild every trawlcomp result from the raw data, what each step does, and which settings matter.
-Current results and decisions are in `STATUS.md`.
+Current results and decisions are in `STATUS.md`. The two-gear (acoustic + trawl) uncertainty methods are
+described step by step in `docs/TWO_GEAR_METHODS.md`.
 
 ## 1. What you need
 
