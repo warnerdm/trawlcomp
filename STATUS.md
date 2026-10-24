@@ -67,6 +67,15 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   same total tows cuts the variance of bloater and smelt by 15-27% (variance ratio 0.73-0.84; SE -8 to -15%);
   little for alewife and other. Each region x stratum cell gets only ~1-3 tows a year.
 
+### 2b. Presentation framework: regions with depth classes (analysis 15; user, 2026-10-24)
+- Goal: explain what is observed. Survey regions as the frame (they already carry geography and, in Michigan,
+  nearshore/offshore); fishing depth 0-20/20-40/40-60/60+ m x bottom depth 0-40/40-80/80-120/120+ m within each
+  region; tows with >= 5 fish; by number. Map, stacked-bar composition figure, table (tows, tows/yr, mean, SD,
+  SE), and the share of tow-to-tow variance explained (R^2 of linear models on tow proportions).
+- Michigan (555 tows): depth explains alewife 31%, bloater 50%, smelt 6%; region alewife 1%, bloater 8%, smelt
+  15%; region x depth 27-58%; unexplained 42-73%. Huron (440): depth smelt 33%, bloater 41%; region 23-26%;
+  region x depth 52-62%; alewife and other mostly unexplained (78-81%).
+
 ### 3. Acoustic (analysis 12; EchoNet2Fish intlaymeans_nph, 2004-2024)
 - Interval x 10 m layer fish_ha placed in the Michigan strata cells; NA/Inf = 0 (user; as EchoNet2Fish's own
   species columns). Zero density is normal in Lake Michigan (user). Pooled mean fish/ha: surface nearshore 377,

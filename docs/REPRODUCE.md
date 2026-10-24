@@ -67,6 +67,7 @@ These are in `R/select_tows.R` (`select_tows()`, `drop_bad_coordinates()`) and `
 | 12 | `12_acoustic_fish_ha_years.R` | `acoustic.R` | EchoNet2Fish fish/ha (NA/Inf = 0) by Michigan stratum, every year | `acoustic_fish_ha_strata_{by_year,pooled}.csv`, `.png` |
 | 13 | `13_region_test.R` (per lake) | `stratum_stats.R` | Does composition differ by survey region (transect prefix) within the strata? | `region_effects_<lake>.csv` |
 | 14 | `14_region_depth_strata.R` (Huron) | `stratum_stats.R` | Region x depth strata: mean, SD, SE per stratum x region; variance gain from splitting each depth stratum by region at the same total tows | `region_depth_stats_<lake>.csv`, `region_split_gain_<lake>.csv`, `region_depth_<lake>.png` |
+| 15 | `15_region_depth_presentation.R` | `region_depth.R` | Presentation framework, both lakes: map of tows by region; composition by fishing depth (0-20/20-40/40-60/60+ m) x bottom depth (0-40/40-80/80-120/120+ m) within each region; table; share of variance explained by region, depth and both | `region_map_<lake>.png`, `region_depth_composition_<lake>.png`, `region_depth_table_<lake>.csv`, `region_depth_variance_<lake>.csv` |
 
 Dependencies: 04, 05 and 06 read 03's output; 10 reads 09's output. `run_all.R` runs them in order.
 
@@ -81,6 +82,7 @@ Dependencies: 04, 05 and 06 read 03's output; 10 reads 09's output. `run_all.R` 
 | Cell size | 20 m | `CELL_M` in 08; `cell_m` arguments elsewhere |
 | Species groups | alewife, smelt, bloater (+ other in Huron) | `R/tow_catch.R` `SPECIES_GROUPS`, `R/stratum_stats.R` `LAKE_STRATA` |
 | Michigan region pooling | nne, nnw, nnlu -> nn | `R/stratum_stats.R` `tow_region()` |
+| Depth classes within regions (step 15) | fishing 0-20/20-40/40-60/60+ m; bottom 0-40/40-80/80-120/120+ m; >= 5 fish | `R/region_depth.R` `FD_BREAKS`, `BD_BREAKS`, `REGION_MIN_FISH` |
 
 ## 6. Reading the results
 
