@@ -196,3 +196,35 @@ plot_tows_strata <- function(pts, cells, cell_m = 20, title = NULL) {
     theme_bw(base_size = 11) + theme(panel.grid = element_blank(), legend.position = "bottom",
                                      plot.caption = element_text(hjust = 0))
 }
+
+# Survey region from the transect name: its leading letters (Michigan nn, no, wn, so, sn as EchoNet2Fish).
+# The later northern splits (nne, nnw from 2016; nnlu, 2 tows in 2011) are merged into nn so the regions are
+# the same in all years (2026-10-24).
+tow_region <- function(transect) {
+  r <- str_extract(tolower(transect), "^[a-z]+")
+  if_else(r %in% c("nne", "nnw", "nnlu"), "nn", r)
+}
+
+# Region effect on tow proportions within each stratum x group: one-way ANOVA p; region share of variance
+# (one-way random-effects variance component, unbalanced n0); SD of tow proportions pooled within regions vs
+# over all tows; p for region after year (anova of p ~ year + region); region means.
+region_effects <- function(props, groups) {
+  props %>%
+    pivot_longer(all_of(groups), names_to = "group", values_to = "count") %>%
+    mutate(p = count / n) %>%
+    group_by(stratum_name, group) %>%
+    group_modify(\(d, k) {
+      g <- n_distinct(d$region)
+      if (sd(d$p) == 0 || g < 2) return(tibble(tows = nrow(d), regions = g))
+      a <- anova(lm(p ~ factor(region), d))
+      ni <- table(d$region); N <- sum(ni); n0 <- (N - sum(ni^2) / N) / (g - 1)
+      msb <- a$`Mean Sq`[1]; msw <- a$`Mean Sq`[2]
+      s2b <- max(0, (msb - msw) / n0)
+      a2 <- anova(lm(p ~ factor(YEAR) + factor(region), d))
+      means <- d %>% summarise(.by = region, m = mean(p), n = n()) %>% arrange(region)
+      tibble(tows = N, regions = g, p_region = a$`Pr(>F)`[1], region_share = s2b / (s2b + msw),
+             sd_all = sd(d$p), sd_within_region = sqrt(msw), p_region_after_year = a2$`Pr(>F)`[2],
+             region_means = paste0(means$region, " ", sprintf("%.2f", means$m), " (", means$n, ")", collapse = ", "))
+    }) %>%
+    ungroup()
+}

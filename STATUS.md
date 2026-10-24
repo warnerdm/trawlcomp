@@ -134,6 +134,12 @@
   40-80 m over 40-120 m (83; 5.5/yr) bloater 0.74 / 0.30 / 0.13, smelt 0.20 / 0.24 / 0.10; 0-20 m over 120-140 m
   (7 tows) mixed. tow_catch fix: a Huron tow with a missing "other" weight now drops out of weight proportions
   (n NA), as for the other groups (Michigan unchanged).
+- Region within strata (2026-10-24; `tow_region()`, `region_effects()` in R/stratum_stats.R, `analysis/13_region_test.R`,
+  output/region_effects_<lake>.csv). Michigan regions from transect names, nne/nnw/nnlu merged into nn (5 regions
+  as EchoNet2Fish). By number: midwater nearshore has a strong north-south split (smelt nn 0.59 vs sn 0.01;
+  bloater nn 0.02 vs sn 0.41; region 37-58% of variance; smelt SD 0.40 -> 0.30 within regions); surface
+  nearshore significant but small (3-14%; smelt nn 0.29 vs sn/so 0.05); surface mid-lake bloater/smelt modest
+  (13-15%); surface offshore and deep none. Region effects mostly survive adjusting for year.
 
 ## Mixed-species tows (Huron first; user, 2026-10-14)
 - Goal: use trawl catch to find tows whose acoustic data SHOULD be mixed species, then look for patterns in the
