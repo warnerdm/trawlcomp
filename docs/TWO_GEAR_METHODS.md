@@ -41,8 +41,28 @@ Code: `R/two_gear.R`; scripts `analysis/17_two_gear_uncertainty.R` (method 1) an
 **Acoustic variance**
 - For each transect t, compute its whole-water-column species density with the proportions held fixed:
   D_t = rho_upper,t x p_upper + rho_lower,t x p_lower.
+  - rho_upper,t: transect t's acoustic fish density (all species) above 40 m: for each of its intervals, the sum
+    of the fish/ha of the 10 m layers between 0 and 40 m, averaged over the transect's intervals.
+  - rho_lower,t: the same for 40 m and deeper (0 for intervals in water shallower than 40 m).
+  - p_upper, p_lower: the region's trawl proportions of the species in each layer; the same for every transect
+    in the region (they come from the region's tows, not from the transect).
+  - D_t: fish of the species per ha along transect t.
 - Var_ac(D_rs) = variance of D_t across the region's transects / number of transects.
-- Combining the layers within each transect keeps the covariance between the layers.
+- Combining the layers within each transect keeps the covariance between the layers: if transects with many
+  fish above 40 m also tend to have many below, that shared variation is counted correctly.
+- Holding the p's fixed and letting only rho vary between transects isolates the uncertainty that comes from
+  the acoustic sampling.
+
+*Worked example* (bloater in one region; p_upper = 0.30, p_lower = 0.95):
+
+| Transect | rho_upper,t | rho_lower,t | D_t (bloater/ha) |
+|---|---|---|---|
+| 1 | 800 | 40 | 800 x 0.30 + 40 x 0.95 = 278 |
+| 2 | 500 | 10 | 150 + 9.5 = 160 |
+| 3 | 1,200 | 60 | 360 + 57 = 417 |
+
+The region's bloater density is the mean of D_t (285 bloater/ha); its acoustic variance is the variance of the
+three D_t values divided by 3 (SD 129, so Var_ac = 129^2 / 3 = 5,547; SE 74.5).
 
 **Trawl variance**
 - SE(p_rls) = SD_rls / sqrt(n), where n = the number of that year's tows used for p.
