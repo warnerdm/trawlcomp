@@ -18,7 +18,8 @@ steps <- list(
   list("09_stratum_stats", "Michigan"), list("09_stratum_stats", "Huron"),
   list("10_strata_figure", "Michigan"), list("10_strata_figure", "Huron"),   # 10 reads 09's output
   list("12_acoustic_fish_ha_years"),
-  list("13_region_test", "Michigan"), list("13_region_test", "Huron")
+  list("13_region_test", "Michigan"), list("13_region_test", "Huron"),
+  list("14_region_depth_strata", "Huron")
 )
 only <- commandArgs(trailingOnly = TRUE)
 if (length(only)) steps <- Filter(\(s) substr(s[[1]], 1, 2) %in% only, steps)

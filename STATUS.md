@@ -60,6 +60,12 @@ worth it?), not apportioning (user). Selectivity is out of scope.
 - Region (transect prefix; Michigan nne/nnw/nnlu pooled into nn): Michigan midwater nearshore has a strong
   north-south split (smelt nn 0.59 vs sn 0.01; region 37-58% of variance); small or none elsewhere. Huron:
   region 20-32% of variance in several strata, including deep bloater/smelt/other.
+- Huron region x depth strata (2026-10-24; analysis 14; regions gb Georgian Bay, me main east, mw main west,
+  nc North Channel, sb southern basin, sg Saginaw Bay 2 tows): smelt dominates gb and nc (0.80-0.96 in the
+  shallow strata), bloater is highest in me and sb (shallow over 40-120 m: 0.45-0.49 vs nc 0.00, gb 0.10); deep
+  bloater 0.78-0.84 in me/mw/sb vs 0.57 gb (nc 3 tows, mostly smelt). Splitting a depth stratum by region at the
+  same total tows cuts the variance of bloater and smelt by 15-27% (variance ratio 0.73-0.84; SE -8 to -15%);
+  little for alewife and other. Each region x stratum cell gets only ~1-3 tows a year.
 
 ### 3. Acoustic (analysis 12; EchoNet2Fish intlaymeans_nph, 2004-2024)
 - Interval x 10 m layer fish_ha placed in the Michigan strata cells; NA/Inf = 0 (user; as EchoNet2Fish's own
@@ -70,7 +76,6 @@ worth it?), not apportioning (user). Selectivity is out of scope.
 ## Open / possible next steps
 - 58104 fishing depth (279 alewife only at 60.4 m).
 - Size groups (species x length cut) in the stratum framework (theory supports it; needs length data and cuts).
-- Huron region effects are large: region x depth strata for Huron if wanted.
 
 ## History (superseded; kept for the record)
 - 2026-10-14: single 35 m layer split for effort/SE curves (analysis 05 still uses it); model tow SD first

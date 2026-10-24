@@ -66,6 +66,7 @@ These are in `R/select_tows.R` (`select_tows()`, `drop_bad_coordinates()`) and `
 | 11 | `11_acoustic_fish_ha.R` (optional, `YEAR`) | `acoustic.R` | One year of EchoNet2Fish fish/ha by stratum, with a cell map | `acoustic_fish_ha_*_<year>` |
 | 12 | `12_acoustic_fish_ha_years.R` | `acoustic.R` | EchoNet2Fish fish/ha (NA/Inf = 0) by Michigan stratum, every year | `acoustic_fish_ha_strata_{by_year,pooled}.csv`, `.png` |
 | 13 | `13_region_test.R` (per lake) | `stratum_stats.R` | Does composition differ by survey region (transect prefix) within the strata? | `region_effects_<lake>.csv` |
+| 14 | `14_region_depth_strata.R` (Huron) | `stratum_stats.R` | Region x depth strata: mean, SD, SE per stratum x region; variance gain from splitting each depth stratum by region at the same total tows | `region_depth_stats_<lake>.csv`, `region_split_gain_<lake>.csv`, `region_depth_<lake>.png` |
 
 Dependencies: 04, 05 and 06 read 03's output; 10 reads 09's output. `run_all.R` runs them in order.
 

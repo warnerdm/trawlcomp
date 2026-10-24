@@ -228,3 +228,28 @@ region_effects <- function(props, groups) {
     }) %>%
     ungroup()
 }
+
+# Region x depth strata. Per depth stratum x region x group: tows, years with tows, tows per year (median over
+# years with tows), mean proportion, SD over all tows, SE at that effort. small = fewer than min_tows tows.
+region_depth_stats <- function(props, groups, min_tows = 5) {
+  props %>%
+    pivot_longer(all_of(groups), names_to = "group", values_to = "count") %>%
+    mutate(p = count / n) %>%
+    summarise(.by = c(stratum_name, region, group), tows = n(), years = n_distinct(YEAR),
+              tows_per_year = median(table(YEAR)), mean_p = mean(p), sd_all = if (n() > 1) sd(p) else NA_real_) %>%
+    mutate(se_now = sd_all / sqrt(tows_per_year), small = tows < min_tows) %>%
+    arrange(stratum_name, group, region)
+}
+
+# Gain from splitting each depth stratum by region, at the same total number of tows (proportional allocation,
+# W_r = region's share of the stratum's tows): variance ratio = sum_r W_r s_r^2 / s^2 (< 1 = splitting helps;
+# Cochran 1977). Regions with < 2 tows contribute no SD and are left out of the sum (their weight dropped).
+region_split_gain <- function(rd, ss) {
+  rd %>%
+    filter(!is.na(sd_all)) %>%
+    mutate(.by = c(stratum_name, group), W = tows / sum(tows)) %>%
+    summarise(.by = c(stratum_name, group), regions = n(), sd_within_regions = sqrt(sum(W * sd_all^2))) %>%
+    left_join(select(ss, stratum_name, group, sd_pooled = sd_all, tows_per_year), by = c("stratum_name", "group")) %>%
+    mutate(variance_ratio = sd_within_regions^2 / sd_pooled^2,
+           se_pooled_now = sd_pooled / sqrt(tows_per_year), se_split_now = sd_within_regions / sqrt(tows_per_year))
+}
