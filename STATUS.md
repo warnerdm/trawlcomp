@@ -114,6 +114,11 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   only that year's tows, so region x layers with 1-3 similar tows have little or no trawl variance (method 1
   borrows the all-years within-year SD), and bootstrap SEs from 2-3 transects are biased low. Shares: bloater
   91% acoustic; alewife about half and half; smelt 89% trawl. Method 1 is the more conservative of the two.
+- Trawl post-strata (FRAME=region_layer_ps; user: trawl only, acoustic regions kept): upper layer by north (nn, no)
+  / south (sn, so, wn) half (>= 5 tows every year), lower layer lake-wide all years pooled (68 tows). 2021 lake
+  totals: alewife 3.35e9 (CV 22% method 1 / 20% bootstrap), smelt 0.67e9 (35% / 29%), bloater 3.86e9 (25% /
+  22%): the methods now agree. Totals shift vs region x layer (so's 4 upper tows, bloater 0.86, vs the south
+  half's 0.55): bias-variance trade-off. Details in docs/TWO_GEAR_METHODS.md.
 
 ## Open / possible next steps
 - mixedtows reads trawlcomp's mixed_tows() live: with 2019-2024 it now gives 63 Huron mixed tows (41 + 22 from

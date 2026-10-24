@@ -73,6 +73,33 @@ Code: `R/two_gear.R`; scripts `analysis/17_two_gear_uncertainty.R` (method 1) an
 - Acoustic and trawl shares: two more runs, one resampling only transects (tows fixed) and one resampling only
   tows (transects fixed); share = each run's variance / their sum.
 
+## Trawl post-stratification (option `FRAME=region_layer_ps`; user, 2026-10-24)
+
+- Purpose: avoid region x layer cells with 0-3 tows in a year. **Only the trawl side changes; the acoustic regions
+  and layers are kept as above.**
+- Upper layer (< 40 m): each region uses the year's mean proportion from its half of the lake:
+  north = nn + no; south = sn + so + wn (wn's composition is closer to the south). Every year 2004-2024 has
+  >= 5 tows in each half (median 11). SE = the half's pooled within-year SD (all years) / sqrt(the year's tows).
+- Lower layer (>= 40 m): every region uses the lake-wide proportion from all years' deep tows pooled (68 tows;
+  bloater 0.93, smelt 0.07). Deep tows number 0-8 a year, but deep composition shows no significant year or
+  region effect. SE = SD / sqrt(68).
+- Bootstrap: upper-layer tows resampled within the year's half; lower-layer tows from the all-years pool.
+- Trade-off: much smaller and more stable trawl variance, at the cost of assuming one composition per half
+  (upper) and one for the whole lake and all years (lower). Region-level differences inside a half are averaged.
+
+**2021 lake totals (fish), region x layer vs post-strata:**
+
+| | Region x layer: total, CV method 1 / bootstrap | Post-strata: total, CV method 1 / bootstrap |
+|---|---|---|
+| Alewife | 2.58e9, 32% / 21% | 3.35e9, 22% / 20% |
+| Smelt | 0.45e9, 85% / 32% | 0.67e9, 35% / 29% |
+| Bloater | 4.85e9, 30% / 24% | 3.86e9, 25% / 22% |
+
+- With post-strata the two methods agree closely, because every trawl cell now has enough tows.
+- The totals move (alewife up, bloater down) mainly because so's upper layer used its own 4 tows (bloater 0.86)
+  in the region x layer version but the south half's 21 tows (bloater 0.55) here. Which is closer to the truth
+  depends on whether so's few 2021 tows represent so; this is the bias side of the trade-off.
+
 ## Differences between the methods and when to use each
 
 | | Method 1 (analytic) | Method 2 (bootstrap) |

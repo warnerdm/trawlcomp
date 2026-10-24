@@ -24,7 +24,8 @@ All paths are set in `R/paths.R` (plus `EN2F_DIR` in `R/acoustic.R`). Nothing ou
 
 About 21 minutes: 15 in step 03 and 4 in step 16 (summaries of the large models). Each step runs in its own R process; one line per step is printed
 (`ok` or `FAILED`), and each step's console output goes to `output/logs/<step>[_<lake>].log`. To rerun only some
-steps, list their numbers: `Rscript run_all.R 08 09 10`.
+steps, list their numbers: `Rscript run_all.R 08 09 10`. Steps 17 and 18 run twice: region x layer and with the
+trawl post-strata (`FRAME=region_layer_ps`).
 
 A single step can also be run by itself. Steps that take a lake read the `LAKE` environment variable
 (default Michigan), e.g. in Git Bash: `LAKE=Huron Rscript analysis/09_stratum_stats.R`.
@@ -71,8 +72,8 @@ These are in `R/select_tows.R` (`select_tows()`, `drop_bad_coordinates()`) and `
 | 14 | `14_region_depth_strata.R` (Huron) | `stratum_stats.R` | Region x depth strata: mean, SD, SE per stratum x region; variance gain from splitting each depth stratum by region at the same total tows | `region_depth_stats_<lake>.csv`, `region_split_gain_<lake>.csv`, `region_depth_<lake>.png` |
 | 15 | `15_region_depth_presentation.R` | `region_depth.R` | Presentation framework, both lakes: map of tows by region; composition by fishing depth (0-20/20-40/40-60/60+ m) x bottom depth (0-40/40-80/80-120/120+ m) within each region; table; share of variance explained by region, depth and both | `region_map_<lake>.png`, `region_depth_composition_<lake>.png`, `region_depth_table_<lake>.csv`, `region_depth_variance_<lake>.csv` |
 | 16 | `16_gam_plots.R` (runs right after 03) | `fit_models.R` | Full `summary()` and random-effect SDs of the step-03 GAMs; smooth-term plots (fishing depth, bottom depth, lon x lat surface) | `model_summaries.txt`, `gam_smooths_<lake>_<group>.png` |
-| 17 | `17_two_gear_uncertainty.R` (`YEAR`, default 2021; `FRAME` region_layer (default), region or strata) | `two_gear.R` | Combined acoustic + trawl uncertainty of species density (method 1, analytic), Michigan, by survey region x depth layer (< / >= 40 m; default), region, or depth stratum: EchoNet2Fish fish/ha with transects as sampling units x the year's trawl proportions; share of the variance from each gear; area-weighted lake totals for regions | `two_gear_michigan_<year>_<region_layer/regions/strata>.csv`, `.png`, `..._lake_total.csv`, `..._region_layer_trawl.csv` |
-| 18 | `18_two_gear_bootstrap.R` (`YEAR` default 2021, `B` default 2000) | `two_gear.R` | Method 2: bootstrap of transects (within region) and that year's tows (within region x layer) for species density by region x depth layer; acoustic-only and trawl-only runs split the variance; lake totals compared with method 1 | `two_gear_boot_michigan_<year>_regions.csv`, `..._lake_total.csv` |
+| 17 | `17_two_gear_uncertainty.R` (`YEAR`, default 2021; `FRAME` region_layer (default), region_layer_ps, region or strata) | `two_gear.R` | Combined acoustic + trawl uncertainty of species density (method 1, analytic), Michigan, by survey region x depth layer (< / >= 40 m; default), region, or depth stratum: EchoNet2Fish fish/ha with transects as sampling units x the year's trawl proportions; share of the variance from each gear; area-weighted lake totals for regions | `two_gear_michigan_<year>_<region_layer/regions/strata>.csv`, `.png`, `..._lake_total.csv`, `..._region_layer_trawl.csv` |
+| 18 | `18_two_gear_bootstrap.R` (`YEAR` default 2021, `B` default 2000, `FRAME` region_layer or region_layer_ps) | `two_gear.R` | Method 2: bootstrap of transects (within region) and that year's tows (within region x layer) for species density by region x depth layer; acoustic-only and trawl-only runs split the variance; lake totals compared with method 1 | `two_gear_boot_michigan_<year>_regions.csv`, `..._lake_total.csv` |
 
 Dependencies: 04, 05, 06 and 16 read 03's output; 10 and 17 read 09's output; 18 reads 17's lake total for the comparison. `run_all.R` runs them in order.
 

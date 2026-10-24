@@ -23,19 +23,27 @@ steps <- list(
   list("14_region_depth_strata", "Huron"),
   list("15_region_depth_presentation"),
   list("17_two_gear_uncertainty"),            # Michigan 2021 (YEAR, FRAME env vars); reads 09's output
-  list("18_two_gear_bootstrap")               # ~1 min; Michigan 2021 bootstrap; compares with 17
+  list("18_two_gear_bootstrap"),              # ~1 min; Michigan 2021 bootstrap; compares with 17
+  list("17_two_gear_uncertainty", "", c(FRAME = "region_layer_ps")),   # trawl post-strata
+  list("18_two_gear_bootstrap", "", c(FRAME = "region_layer_ps"))
 )
 only <- commandArgs(trailingOnly = TRUE)
 if (length(only)) steps <- Filter(\(s) substr(s[[1]], 1, 2) %in% only, steps)
 
+# A step is list(script, lake = "", env = c(NAME = "value", ...)); env vars are set for that step only.
 for (s in steps) {
   script <- s[[1]]; lake <- if (length(s) > 1) s[[2]] else ""
+  env <- if (length(s) > 2) s[[3]] else character(0)
   Sys.setenv(LAKE = lake)
   if (lake == "") Sys.unsetenv("LAKE")
-  log <- file.path(root, "output", "logs", paste0(script, if (nzchar(lake)) paste0("_", tolower(lake)), ".log"))
+  Sys.unsetenv(c("FRAME", "YEAR", "B"))
+  if (length(env)) do.call(Sys.setenv, as.list(env))
+  tag <- paste0(if (nzchar(lake)) paste0("_", tolower(lake)), if (length(env)) paste0("_", paste(env, collapse = "_")))
+  log <- file.path(root, "output", "logs", paste0(script, tag, ".log"))
   t0 <- Sys.time()
   status <- system2(rscript, shQuote(file.path(root, "analysis", paste0(script, ".R"))), stdout = log, stderr = log)
-  cat(sprintf("%-28s %-9s %s (%.0f s)\n", script, lake, if (status == 0) "ok" else paste("FAILED, see", log),
+  cat(sprintf("%-28s %-16s %s (%.0f s)\n", script, paste0(lake, paste(env, collapse = " ")),
+              if (status == 0) "ok" else paste("FAILED, see", log),
               as.numeric(difftime(Sys.time(), t0, units = "secs"))))
   if (status != 0) stop("stopped at ", script)
 }

@@ -129,18 +129,20 @@ combine_region_layers <- function(at, tr) {
 # of that layer, as in method 1), recomputes D = sum over layers rho_layer x p_layer per region and the area-
 # weighted lake total. mode "both", "acoustic" (tows fixed) or "trawl" (transects fixed) splits the variance.
 # Note: a region x layer with one tow has no bootstrap variance (method 1 borrows an all-years SD instead).
-bootstrap_region_layer <- function(at, props_year, groups, B = 2000, mode = "both", seed = 1) {
+bootstrap_region_layer <- function(at, props_year, groups, B = 2000, mode = "both", seed = 1, pools = NULL) {
   set.seed(seed)
   tw <- props_year %>% mutate(layer = layer_of(fishing_depth)) %>%
     mutate(across(all_of(groups), \(x) x / n))
   regions <- unique(at$region); layers <- unique(at$layer)
   area <- distinct(at, region, regarea)
-  # tow pool per region x layer (fallback: lake-wide pool for the layer)
-  pools <- list()
-  for (r in regions) for (l in layers) {
-    d <- filter(tw, region == r, layer == l)
-    if (nrow(d) == 0) d <- filter(tw, layer == l)
-    pools[[paste(r, l)]] <- as.matrix(d[groups])
+  # tow pool per region x layer (fallback: lake-wide pool for the layer), unless given (trawl post-strata)
+  if (is.null(pools)) {
+    pools <- list()
+    for (r in regions) for (l in layers) {
+      d <- filter(tw, region == r, layer == l)
+      if (nrow(d) == 0) d <- filter(tw, layer == l)
+      pools[[paste(r, l)]] <- as.matrix(d[groups])
+    }
   }
   acw <- at %>% pivot_wider(names_from = layer, values_from = fish_ha, values_fill = 0)
   out <- vector("list", B)
@@ -169,4 +171,46 @@ summarise_boot <- function(bt) {
   tot <- bt %>% summarise(.by = c(b, group), N = sum(regarea * D)) %>%
     summarise(.by = group, N_mean = mean(N), se_N = sd(N), lo = quantile(N, 0.025), hi = quantile(N, 0.975))
   list(region = reg, total = tot)
+}
+
+# --- Trawl post-strata (user, 2026-10-24: trawl only; the acoustic regions are kept) ---
+# Upper layer (< 40 m): the year's tows in the region's half of the lake, north (nn, no) or south (sn, so, wn; wn's
+# composition is closer to the south). Lower layer (>= 40 m): lake-wide tows of ALL years pooled (0-8 deep tows a
+# year; deep composition ~98% bloater with no significant year or region effect).
+TRAWL_HALF <- c(nn = "north", no = "north", sn = "south", so = "south", wn = "south")
+
+ps_long <- function(props, groups) {
+  props %>% mutate(layer = layer_of(fishing_depth), half = TRAWL_HALF[region]) %>%
+    pivot_longer(all_of(groups), names_to = "group", values_to = "count") %>% mutate(p = count / n)
+}
+
+# Method 1 proportions per region x layer under the post-strata. Upper: the year's mean in the half, SE = the half's
+# pooled within-year SD (all years) / sqrt(year's tows). Lower: all-years lake-wide mean, SE = SD / sqrt(all tows).
+trawl_post_strata <- function(props, year, groups, regions) {
+  long <- ps_long(props, groups)
+  up <- filter(long, layer == layer_of(0))
+  sd_up <- up %>% summarise(.by = c(half, group), sd = sqrt(sum((p - ave(p, YEAR))^2) / (n() - n_distinct(YEAR))))
+  p_up <- up %>% filter(YEAR == year) %>% summarise(.by = c(half, group), tows = n(), p = mean(p)) %>%
+    left_join(sd_up, by = c("half", "group")) %>% mutate(se_p = sd / sqrt(tows), p_source = paste(half, "half,", year))
+  p_lo <- long %>% filter(layer == layer_of(100)) %>%
+    summarise(.by = group, tows = n(), sd = sd(p), p = mean(p)) %>%
+    mutate(se_p = sd / sqrt(tows), p_source = "lake-wide, all years")
+  bind_rows(
+    tibble(region = regions, half = unname(TRAWL_HALF[regions])) %>%
+      left_join(p_up, by = "half", relationship = "many-to-many") %>% mutate(layer = layer_of(0)),
+    expand_grid(region = regions, p_lo) %>% mutate(layer = layer_of(100))) %>%
+    select(region, layer, group, p_source, tows, p, sd, se_p)
+}
+
+# Bootstrap pools under the post-strata (matrices of tow proportions keyed "region layer")
+post_strata_pools <- function(props, year, groups, regions) {
+  tw <- props %>% mutate(layer = layer_of(fishing_depth), half = TRAWL_HALF[region]) %>%
+    mutate(across(all_of(groups), \(x) x / n))
+  lo <- as.matrix(filter(tw, layer == layer_of(100))[groups])
+  pools <- list()
+  for (r in regions) {
+    pools[[paste(r, layer_of(0))]] <- as.matrix(filter(tw, YEAR == year, layer == layer_of(0), half == TRAWL_HALF[[r]])[groups])
+    pools[[paste(r, layer_of(100))]] <- lo
+  }
+  pools
 }
