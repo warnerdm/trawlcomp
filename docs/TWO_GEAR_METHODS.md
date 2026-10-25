@@ -1,5 +1,7 @@
 # Combined acoustic and trawl uncertainty of species density: methods
 
+*First attempt (2026-10-24), frozen here; the work continues in .*
+
 Code: `R/two_gear.R`; scripts `analysis/17_two_gear_uncertainty.R` (method 1) and `analysis/18_two_gear_bootstrap.R`
 (method 2). Default: Lake Michigan, 2021, survey regions x two depth layers.
 

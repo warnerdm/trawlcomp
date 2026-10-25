@@ -91,7 +91,10 @@ worth it?), not apportioning (user). Selectivity is out of scope.
   midwater 68, mid-lake 355, offshore 433, deep 18.5. All water below 40 m is ~0-1 fish/ha in 2004-2010 in these
   files (inside and outside the deep stratum). Paused (user).
 
-### 4. Two-gear uncertainty (analysis 17; method 1, analytic; 2026-10-24)
+### 4. Two-gear uncertainty (analysis 17; method 1, analytic; 2026-10-24) -- FIRST ATTEMPT, FROZEN
+- (user, 2026-10-24) Continued as its own project, D:\pyprojects\cv_compare_acmt, with its own data (incl. the 25
+  Michigan 2021 TARGET 119 survey-time tows and more acoustic data). trawlcomp keeps this version (L_2_Y tows only)
+  as the first attempt; steps 17-20 here are not developed further.
 - Species density D = rho x p; Var(D) = p^2 Var(rho) + rho^2 Var(p) + Var(rho) Var(p) (Goodman 1960); gears
   independent because sigma is in-situ TS (user). Default frame: the survey regions nn/no/sn/so/wn (user; as
   EchoNet2Fish; FRAME=strata gives the depth-strata version). rho = EchoNet2Fish water-column fish/ha (interval =
